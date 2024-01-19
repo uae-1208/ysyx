@@ -1,0 +1,5 @@
+marco () {
+	pwd > ~/dir.txt
+}
+
+

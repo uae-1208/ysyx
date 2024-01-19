@@ -1,0 +1,49 @@
+1.
+-  ls -a
+-  ls -lh
+-  ls -ltr
+-  ls --color=auto
+
+--------------------------------------
+
+2.
+touch ~/dir.txt
+vim ~/marco.sh
+
+marco () {
+	pwd > ~/dir.txt
+}
+
+source marco.sh 
+marco
+cat ~/dir.txt
+
+vim ~/polo.sh
+
+polo () {
+	cd $(cat ~/dir.txt)
+}
+
+source polo.sh
+
+cd ~
+marco
+cd anaconda3/bin
+polo
+
+--------------------------------------
+
+3.
+chomd +x mysh3.sh
+./mysh3.sh
+
+--------------------------------------
+
+4.
+find . -path '*/*.sh' -type f | xargs -d '\n'  tar cvzf html.tar.gz
+
+--------------------------------------
+
+5.
+find . -type f | xargs ls -lt
+(referrd to the answer)
