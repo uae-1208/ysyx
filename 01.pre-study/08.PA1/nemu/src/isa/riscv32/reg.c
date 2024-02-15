@@ -25,10 +25,10 @@ const char *regs[] = {
 
 void isa_reg_display() 
 {
-  printf("RegName    Hex_Value         Dec_Value\n");
+  printf("RegName  Hex_Value       Dec_Value\n");
   for(int i = 0; i < 32; i++)
   {
-    printf("%-10s 0x%08x        %-15d\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
+    printf("%s\t 0x%08x\t %-d\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
   }
 }
 

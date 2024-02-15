@@ -62,6 +62,7 @@ static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_x(char *args);
+static int cmd_p(char *args);
 /**************************/
 
 
@@ -76,8 +77,9 @@ static struct {
 
   /* TODO: Add more commands */
   { "si", "Excute N instruction(s)", cmd_si },
-  { "info", "Display information about registers or watch points.", cmd_info },
+  { "info", "Display information about registers or watch points", cmd_info },
   { "x", "Display memory content of N word(s) in HEX", cmd_x },
+  { "p", "Get the value of the expression", cmd_p },
 
 };
 
@@ -106,7 +108,8 @@ static int cmd_si(char *args) {
 }
 
 
-static int cmd_info(char *args) {
+static int cmd_info(char *args) 
+{
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
 
@@ -170,6 +173,21 @@ static int cmd_x(char *args)
   for(int i = 0; i < word_num; i++, mem_addr+=4)
     printf("[0x%08x]:  0x%08x\n", mem_addr, host_read(guest_to_host(mem_addr), 4));
   
+  return 0;
+}
+
+
+static int cmd_p(char *args) 
+{
+  //uae
+  bool a = 1;
+
+  if (args == NULL) 
+    /* no argument given */
+    printf("No expression inputed.\n");
+  else 
+    expr(args, &a);
+
   return 0;
 }
 /**************************/
