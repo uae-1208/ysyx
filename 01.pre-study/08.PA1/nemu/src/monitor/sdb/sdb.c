@@ -179,14 +179,14 @@ static int cmd_x(char *args)
 
 static int cmd_p(char *args) 
 {
-  //uae
-  bool a = 1;
+  bool success = true;
 
-  if (args == NULL) 
-    /* no argument given */
-    printf("No expression inputed.\n");
-  else 
-    expr(args, &a);
+  // if (args == NULL) 
+  //   /* no argument given */
+  //   printf("No expression inputed.\n");
+  // else 
+    expr(args, &success);
+  assert(success == true);
 
   return 0;
 }

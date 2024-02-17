@@ -133,7 +133,6 @@ static bool make_token(char *e)
       return false;
     }
   }
-
   return true;
 }
 
@@ -150,7 +149,7 @@ static bool check_parentheses(int start, int end)
       num_Lparentheses++;
     else if((strcmp(tokens[i].str, ")") == 0)) //when encountering a ")", eliminate a "("
     {
-      if(num_Lparentheses > 1)    //not the first "("
+      if(num_Lparentheses > 1)    //the first "(" is not eliminated yet
         num_Lparentheses--;
       else if((num_Lparentheses == 1) && (i == end))  //the first "(" and the last ")"
         return true;
@@ -158,43 +157,100 @@ static bool check_parentheses(int start, int end)
         return false;
     }
   }
-
   return false;
 }
 
-// static int eval(int start, int end)
-// {
-//   if (p > q) {
-//     /* Bad expression */
-//     assert(0);
-//   }
-//   else if (p == q) {
-//     /* Single token.
-//      * For now this token should be a number.
-//      * Return the value of the number.
-//      */
-//     return (tokens[p].str - '0');
-//   }
-//   else if (check_parentheses(p, q) == true) {
-//     /* The expression is surrounded by a matched pair of parentheses.
-//      * If that is the case, just throw away the parentheses.
-//      */
-//     return eval(p + 1, q - 1);
-//   }
-//   else {
-//     /* We should do more things here. */
-//     op = the position of 主运算符 in the token expression;
-//     val1 = eval(p, op - 1);
-//     val2 = eval(op + 1, q);
-//
-//     switch (op_type) {
-//       case '+': return val1 + val2;
-//       case '-': /* ... */
-//       case '*': /* ... */
-//       case '/': /* ... */
-//       default: assert(0);
-//   }
-// }
+#define Is_op(c)  (((c) == '+') || ((c) == '-') || ((c) == '*') || ((c) == '/'))
+//check whether the "prime" is primer than the "token" ['+'= '-' > '*' = '/']
+static bool check_precedence(char prime, char token)
+{
+  assert((prime == '+') || (prime == '-') || (prime == '*') || (prime == '/'));
+  assert((token == '+') || (token == '-') || (token == '*') || (token == '/'));
+
+  if((token == '+') || (token == '-'))
+    return false;
+  else if((token == '*') || (token == '/'))
+  {
+    if((prime == '+') || (prime == '-'))
+      return true;
+    else
+      return false;
+  }
+  return false;
+}
+
+//get the position of the prime operator
+static int get_prime(int start, int end)
+{
+  int num_Lparentheses = 0;   //The amount of "(" by now
+  int p_op_position = start;
+  char p_op_type = '*';
+
+
+  for(int i = start; i <= end; i++)
+  {
+    if((strcmp(tokens[i].str, "(") == 0))   //encounter a "("
+      num_Lparentheses++;
+    else if((strcmp(tokens[i].str, ")") == 0))  //when encountering a ")", eliminate a "("
+      num_Lparentheses--;
+    else   //the token is either a number or a operator
+    {
+      if(num_Lparentheses < 0)  //wrong expression
+        return -1;
+      else if(num_Lparentheses == 0) //the token if out of one parentheses
+      {
+        //the token is an operator and is primer
+        if(Is_op(tokens[i].str[0]) && !check_precedence(p_op_type, tokens[i].str[0]))
+        {
+          p_op_position = i;   
+          p_op_type = tokens[i].str[0];
+        }
+      }
+    }
+  }
+
+  if(num_Lparentheses < 0)  //wrong expression
+    return -1;
+  if(p_op_position == start) //no operator found
+    return -1;
+
+  return p_op_position;
+}
+
+static uint32_t eval(int p, int q)
+{
+  if (p > q) {
+    /* Bad expression */
+    assert(0);
+  }
+  else if (p == q) {
+    /* Single token.
+     * For now this token should be a number.
+     * Return the value of the number.
+     */
+    return (tokens[p].str[0] - '0');
+  }
+  else if(check_parentheses(p, q) == true) {
+    /* The expression is surrounded by a matched pair of parentheses.
+     * If that is the case, just throw away the parentheses.
+     */
+    return eval(p + 1, q - 1);
+  }
+  else {
+    /* We should do more things here. */
+    int op = get_prime(p, q);         assert(op != -1);
+    uint32_t val1 = eval(p, op - 1);
+    uint32_t val2 = eval(op + 1, q);
+
+    switch (tokens[op].str[0]) {
+      case '+': return val1 + val2;
+      case '-': return val1 - val2;
+      case '*': return val1 * val2;
+      case '/': return val1 / val2;
+      default: assert(0);
+    }
+  }
+}
 
 word_t expr(char *e, bool *success)
 {
@@ -205,16 +261,53 @@ word_t expr(char *e, bool *success)
   }
 
   /* TODO: Insert codes to evaluate the expression. */
+  printf("%s = %u\n", e, eval(0, nr_token-1));
+
+
   /*1. testing make_token()*/
-  // for(int i = 0; i < nr_token; i++)
-  //   printf("%s",tokens[i].str);
-  // printf("\n");
-
+  // {
+  //   for(int i = 0; i < nr_token; i++)
+  //     printf("%s",tokens[i].str);
+  //   printf("\n");
+  // }
+  
   /*2. testing check_parentheses()*/
-  for(int i = 0; i < nr_token; i++)
-    printf("%s",tokens[i].str);
-  printf("      %s!\n", check_parentheses(0, nr_token-1) ? "true" : "false");
+  // {
+  //   for(int i = 0; i < nr_token; i++)
+  //     printf("%s",tokens[i].str);
+  //   printf("      %s!\n", check_parentheses(0, nr_token-1) ? "true" : "false");
+  // }
 
+  /*3. testing get_prime()*/
+  // {
+  //   for(int i = 0; i < nr_token; i++)
+  //     printf("%s",tokens[i].str);
+  //   printf("\n");
+  //   for(int i = 0; i < nr_token; i++)
+  //     printf("[%d]%s  ",i, tokens[i].str);
+  //   printf("\nprime:%d\n",get_prime(0, nr_token-1)); 
+  // }
+  
+  /*4. testing eval()*/
+  // {
+  //   uint32_t result, eval_result;
+  //   int ret;
+  //   char buff[40];
+  //   char* p;
+  //   FILE *fp = fopen("/home/uae/ysyx/ysyx-workbench/nemu/tools/gen-expr/uae", "r");
+  //   assert(fp != NULL);
+  //   for(int i = 0; i < 988; i++)
+  //   {
+  //     ret = fscanf(fp, "%u ", &result);   assert(ret != 0);//fscanf读取字符串时无法读取空格
+  //     p = fgets(buff, 40, fp);   assert(p != NULL);  //fgets遇到\n时结束读取，但会读取进\n
+  //     buff[strlen(buff) - 1] = '\0';     //删除\n
+  //     assert(make_token(buff) == 1);
+  //     eval_result = eval(0, nr_token-1);
+  //     printf("%s = %u",buff ,eval_result);
+  //     printf("     result=%u\n", result);
+  //     assert(result == eval_result);
+  //   }
+  // }
 
   return 0;
 }

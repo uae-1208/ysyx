@@ -49,11 +49,11 @@ static char* gen_num(void)
 // {
 //   int num = choose(5) + 2;  //1-5(except one space byte)
 //   char* str = (char*)malloc(num * sizeof(char));
-
+// 
 //   for(int i = 0; i < num - 1; i++)
 //     strcat(str, " ");
 //   str[num - 1] = '\0';
-
+// 
 //   return str;
 // }
 
