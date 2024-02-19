@@ -32,6 +32,19 @@ void isa_reg_display()
   }
 }
 
-word_t isa_reg_str2val(const char *s, bool *success) {
+word_t isa_reg_str2val(const char *s, bool *success) 
+{
+  int i;
+  //reg $0
+  if(strcmp(s, regs[0]) == 0)
+      return cpu.gpr[0];
+      
+  //others
+  for(i = 1; i < 32; i++)
+    if(strcmp(s, regs[i]) == 0)
+      return cpu.gpr[i];
+
+  //no reg name matched
+  *success = false;
   return 0;
 }

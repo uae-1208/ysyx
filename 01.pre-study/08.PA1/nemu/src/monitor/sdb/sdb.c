@@ -181,11 +181,12 @@ static int cmd_p(char *args)
 {
   bool success = true;
 
-  // if (args == NULL) 
-  //   /* no argument given */
-  //   printf("No expression inputed.\n");
-  // else 
-    expr(args, &success);
+  if (args == NULL) 
+    /* no argument given */
+    printf("No expression inputed.\n");
+  else 
+    // expr(args, &success);
+    printf("%s = %u\n",args, expr(args, &success));
   assert(success == true);
 
   return 0;

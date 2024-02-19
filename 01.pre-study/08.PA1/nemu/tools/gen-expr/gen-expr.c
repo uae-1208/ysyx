@@ -82,7 +82,7 @@ static char* gen_rand_op(void)
   return str;
 }
 
-#define token_size 32  //according to the KISS principle, 从简单的情况的开始（tokens数组长度为32）
+#define token_size 50  //according to the KISS principle, 从简单的情况的开始（tokens数组长度为32）
 static char* random_expr(void) 
 {
   char* str = (char*)malloc(2 * token_size * sizeof(char));
