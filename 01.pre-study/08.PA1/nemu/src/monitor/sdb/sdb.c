@@ -18,16 +18,17 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
-/**********Appended by uae**********/
 #include <memory/paddr.h>
 #include <memory/host.h>
-/***********************************/
 
 
 static int is_batch_mode = false;
 
-void init_regex();
-void init_wp_pool();
+void init_regex(void);
+void init_wp_pool(void);
+void new_wp(char *expr);
+int free_wp(int NO);
+void wp_display(void);
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -63,6 +64,8 @@ static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_x(char *args);
 static int cmd_p(char *args);
+static int cmd_w(char *args);
+static int cmd_d(char *args);
 /**************************/
 
 
@@ -80,6 +83,8 @@ static struct {
   { "info", "Display information about registers or watch points", cmd_info },
   { "x", "Display memory content of N word(s) in HEX", cmd_x },
   { "p", "Get the value of the expression", cmd_p },
+  { "w", "Add one watch point", cmd_w },
+  { "d", "Delete one watch point", cmd_d },
 
 };
 
@@ -91,16 +96,16 @@ static struct {
 
 static int cmd_si(char *args) {
   /* extract the first argument */
-  char *arg = strtok(NULL, " ");
+  char *buff = strtok(NULL, " ");
   //The number of instruction to excute.
   int inst_num = 0;
 
-  if (arg == NULL) 
+  if (buff == NULL) 
     /* no argument given */
     inst_num = 1;
   else 
     //extract the number by converting  char* into int
-    sscanf(arg, "%d", &inst_num);
+    sscanf(buff, "%d", &inst_num);
   
   Log("%d instruction(s) excuted.", inst_num);
   cpu_exec(inst_num);
@@ -111,31 +116,29 @@ static int cmd_si(char *args) {
 static int cmd_info(char *args) 
 {
   /* extract the first argument */
-  char *arg = strtok(NULL, " ");
+  char *buff = strtok(NULL, " ");
 
-  if (arg == NULL) 
+  if (buff == NULL) 
   {
     /* no argument given */
-    printf("Input 'r' for registers or 'w' for watch points.\n");
+    Log_R("Input 'r' for registers or 'w' for watch points!");
   }
   else 
   {
-    if('r' == *arg)
+    if(strcmp(buff, "r") == 0)
     {
       //register
       Log("Display register information.");
       isa_reg_display();
     }
-    else if('w' == *arg)
+    else if(strcmp(buff, "w") == 0)
     {
-      //watch point
-      printf("Something not appended yet. Be patient!\n");
+      //watch point     
+      Log("Display watchpoint information.");
+      wp_display();
     }
     else
-    {
-      printf("Unknown arguments '%s'. ", arg);
-      printf("Input 'r' for registers or 'w' for watch points.\n");
-    }
+      Log_R("Unknown arguments '%s'. Input 'r' for registers or 'w' for watch points.", buff);
   }
   
   return 0;
@@ -145,33 +148,44 @@ static int cmd_info(char *args)
 static int cmd_x(char *args)
 {
   /* extract the first argument */
-  char *arg = strtok(NULL, " ");
-  //The number of words to display.
-  int word_num = 0;
+  char *buf = NULL;
+  int word_num = 0;     //The number of words to display.
   vaddr_t mem_addr = 0;
+  bool success = true;
 
+  /* no argument given */
+  if(args == NULL)
+  {
+    Log_R("No argument inputed!");
+    return 0;
+  }
+
+  buf = strtok(NULL, " ");
   //the number argument
-  //extract the number by converting  char* into int
-  sscanf(arg, "%d", &word_num);
-  
+  sscanf(buf, "%d", &word_num);
 
   //the addrdess argument
-  arg = strtok(NULL, " ");
-  if (arg == NULL) 
+  buf = strtok(NULL, "");
+  if (buf == NULL) 
   {
     /* no argument given */
-    printf("No memory address inputed.\n");
+    Log_R("No memory address inputed!");
     return 0;
   }
   else 
-    //extract the number by converting  char* into int
-    sscanf(arg, "%x", &mem_addr);   //consider the input as hex
-
+  {
+    mem_addr = expr(buf, &success);
+    assert(success == true);
+  }
 
   Log("Display memory content of %d words.", word_num);
-  printf(" Address       value\n");
+  printf("\33[1;31m Address       value\n\33[0m");   //"\33[1;31m" means red，"\n\33[0m" means returning to default
   for(int i = 0; i < word_num; i++, mem_addr+=4)
-    printf("[0x%08x]:  0x%08x\n", mem_addr, host_read(guest_to_host(mem_addr), 4));
+  {
+      printf("\33[1;33m[0x%08x]:\33[0m", mem_addr);
+      printf("  0x%08x\n",host_read(guest_to_host(mem_addr), 4));
+      
+  }
   
   return 0;
 }
@@ -180,18 +194,65 @@ static int cmd_x(char *args)
 static int cmd_p(char *args) 
 {
   bool success = true;
+  uint32_t result;
 
   if (args == NULL) 
     /* no argument given */
-    printf("No expression inputed.\n");
+    Log_R("No expression inputed!");
   else 
-    // expr(args, &success);
-    printf("%s = %u\n",args, expr(args, &success));
-  assert(success == true);
+  {
+    result = expr(args, &success);
+    Log("%s = %u",args, result);
+  }
+
+  assert(success == true);  
+
+  return 0;
+}
+
+
+static int cmd_w(char *args)
+{
+  if (args == NULL) 
+    /* no argument given */
+    Log_R("No expression inputed!");
+  else 
+  {
+    new_wp(args);
+    Log("Create a watchpoint:[%s]", args);
+  }
+
+  return 0;
+}
+
+
+static int cmd_d(char *args) 
+{
+  int wp_no, ret;
+
+  if (args == NULL) 
+  {
+    /* no argument given */
+    Log_R("No watchpoint number inputed!");
+    return 0;
+  }
+    
+  //the number argument
+  sscanf(args, "%d", &wp_no);
+  ret = free_wp(wp_no);
+
+  switch (ret)
+  {
+    case 0: Log("Delete watchpoint %d", wp_no); break;
+    case 1: Log_R("No watchpoint existed!"); break;
+    case 2: Log_R("No watchpoint with number! %d", wp_no); break;
+    default:assert(0);
+  }
 
   return 0;
 }
 /**************************/
+
 
 
 

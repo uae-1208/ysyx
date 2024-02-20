@@ -25,16 +25,23 @@ const char *regs[] = {
 
 void isa_reg_display() 
 {
-  printf("RegName  Hex_Value       Dec_Value\n");
+  //"\33[1;31m" means red，"\n\33[0m" means returning to default
+  printf("\33[1;31mRegName  Hex_Value       Dec_Value\n\33[0m");
+  printf("\33[1;33m$%s\t\33[0m 0x%08x\t %010u\n", "pc", cpu.pc, cpu.pc);
   for(int i = 0; i < 32; i++)
   {
-    printf("%s\t 0x%08x\t %-d\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
+    printf("\33[1;33m$%s\t \33[0m", regs[i]);
+    printf("0x%08x\t %010u\n", cpu.gpr[i], cpu.gpr[i]);
   }
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) 
 {
   int i;
+  //pc
+  if(strcmp(s, "pc") == 0)
+      return cpu.pc; 
+      
   //reg $0
   if(strcmp(s, regs[0]) == 0)
       return cpu.gpr[0];
