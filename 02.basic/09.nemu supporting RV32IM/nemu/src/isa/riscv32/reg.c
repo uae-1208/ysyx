@@ -39,17 +39,17 @@ void isa_single_reg_display(char *reg_name)
 {
   int i;
   //pc
-  printf("\33[1;31mRegName  Hex_Value       Dec_Value\n\33[0m");
+  printf("\33[1;31mRegName  Hex_Value       U-Dec_Value       Dec_Value\n\33[0m");
   if(strcmp(reg_name, "pc") == 0)
   {
-    printf("\33[1;33m$%s\t\33[0m 0x%08x\t %010u\n", "pc", cpu.pc, cpu.pc);
+    printf("\33[1;33m$%s\t\33[0m 0x%08x\t %010u %010d\n", "pc", cpu.pc, cpu.pc, cpu.pc);
     return;
   }
 
   //reg $0
   if(strcmp(reg_name, regs[0]) == 0)
   {
-    printf("\33[1;33m$%s\t\33[0m 0x%08x\t %010u\n", "$0", cpu.gpr[1], cpu.gpr[1]);
+    printf("\33[1;33m$%s\t\33[0m 0x%08x\t %010u\t   %-10d\n", "$0", cpu.gpr[1], cpu.gpr[1], cpu.gpr[1]);
     return;
   }      
 
@@ -57,7 +57,7 @@ void isa_single_reg_display(char *reg_name)
   for(i = 1; i < 32; i++)
     if(strcmp(reg_name, regs[i]) == 0)
     {
-      printf("\33[1;33m$%s\t\33[0m 0x%08x\t %010u\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
+      printf("\33[1;33m$%s\t\33[0m 0x%08x\t %010u\t   %-10d\n", regs[i], cpu.gpr[i], cpu.gpr[i], cpu.gpr[i]);
       return;
     }
 
