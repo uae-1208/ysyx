@@ -4,12 +4,12 @@ module alu(
     input  wire           aluc,
     input  wire [`RegBus] num1,
     input  wire [`RegBus] num2,
-    output wire [`RegBus] result
+    output reg  [`RegBus] result
 );
 
     always @(*) begin
         case (aluc)
-            ADD:     result = num1 + num2;
+            `ADD:    result = num1 + num2;
             default: result = num1 + num2;
         endcase
     end

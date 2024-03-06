@@ -6,9 +6,9 @@ module control_unit(
     output wire [4:0]       rs1_19_15,
     output wire [4:0]       rs2_24_20,
     output wire [6:0]       fun7_31_25,
-    output wire [`TYPE_BUS] type,       //inst type
-    output wire             aluc,       //alu operation type
-    output wire             m1          //mux1 sel
+    output reg  [`TYPE_BUS] type,       //inst type
+    output reg              aluc,       //alu operation type
+    output reg              m1          //mux1 sel
 );
 
     wire [6:0] opcode_6_0; 
@@ -29,8 +29,8 @@ module control_unit(
                 type = `INST_I;
                 m1   = `MUX1_imm;
                 case (fun3_14_12)
-                    `INST_ADDI: aluc = ADD;
-                    default:    aluc = ADD;
+                    `INST_ADDI: aluc = `ADD;
+                    default:    aluc = `ADD;
                 endcase
             end
             /*`INST_TYPE_E: begin

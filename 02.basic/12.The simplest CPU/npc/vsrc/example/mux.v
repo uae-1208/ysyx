@@ -14,7 +14,7 @@ module MuxKeyInternal #(NR_KEY = 2, KEY_LEN = 1, DATA_LEN = 1, HAS_DEFAULT = 0) 
 
     genvar n;
     generate
-        for(n = 0; n < NR_KEY; n = n + 1) begin
+        for(n = 0; n < NR_KEY; n = n + 1) begin : generate_block_identifier
             assign pair_list[n] = lut[PAIR_LEN * ( n + 1) - 1 : PAIR_LEN * n];
             assign data_list[n] = pair_list[n][DATA_LEN-1 : 0];
             assign key_list[n]  = pair_list[n][PAIR_LEN-1 : DATA_LEN];
