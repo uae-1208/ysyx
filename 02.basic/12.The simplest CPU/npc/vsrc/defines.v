@@ -29,7 +29,8 @@
 
 
 // ALU
-`define ADD 1'b0
+`define ADD     1'b0
+`define AlucBus 0:0
 
 
 // PC

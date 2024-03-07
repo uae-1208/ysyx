@@ -1,4 +1,4 @@
-`include "defines.v"
+`include "/home/uae/ysyx/ysyx-workbench/npc/vsrc/defines.v"
 
 module register_file(
     input  wire           clk,
@@ -19,7 +19,7 @@ module register_file(
     always @(posedge clk, posedge rst) begin
         if(rst == `RST_VAL) begin
             for(i=0; i<32; i=i+1) begin
-                regs[i] = `RegRstVal;  
+                regs[i] <= `RegRstVal;  
             end
         end else if((wen == 1'b1) && (rd != `Reg0))
             regs[rd] <= result; 

@@ -1,13 +1,13 @@
-`include "defines.v"
+`include "/home/uae/ysyx/ysyx-workbench/npc/vsrc/defines.v"
 
 module RISB_type(
     input  wire [4:0]       rs2,
     input  wire [6:0]       funct7,
-    input  wire [`TYPE_BUS] type,
+    input  wire [`TYPE_BUS] type2,
     output reg  [11:0]      imm_12
 );
     always @(*) begin
-        case (type)
+        case (type2)
             `INST_R: imm_12 = 12'b0000_0000_0000;
             `INST_I: imm_12 = {funct7, rs2};
             //`INST_S: imm_12 = {funct7, rd};
@@ -35,7 +35,7 @@ endmodule*/
 module imm_extend(
     input  wire [4:0]       rs2,
     input  wire [6:0]       funct7,
-    input  wire [`TYPE_BUS] type,
+    input  wire [`TYPE_BUS] type3,
     output wire [`RegBus]   imm32
 );
 
@@ -44,7 +44,7 @@ module imm_extend(
     RISB_type RISB_type_inst(
         .rs2   (rs2),
         .funct7(funct7),
-        .type  (type),
+        .type2 (type3),
         .imm_12(imm_12)
     );
 
