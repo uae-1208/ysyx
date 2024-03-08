@@ -7,3 +7,4 @@
 - **2024/3/5** ：绘制整体的框架图，包括`top module`、`regfile module`、`control unit module`
 - **2024/3/6** ：小修了一下框架图，完成简单NPC的RTL代码
 - **2024/3/7** ：修改简单NPC的RTL代码的语法错误，编写tbcpp文件，修改Makefile以适应**bug迭出**的`verilator`(如不弹出所有warning，避免type信号命名一致等)
+- **2024/3/8** ：完成了简单的NPC部分，包括执行`addi`指令和`DPI-C`机制下的`ebreak`指令
