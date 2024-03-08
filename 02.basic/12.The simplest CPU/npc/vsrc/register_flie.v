@@ -3,7 +3,7 @@
 module register_file(
     input  wire           clk,
     input  wire           rst,
-    input  wire           wen,
+    input  wire           clk1_flag,
     input  wire [4:0]     rs1,
     input  wire [4:0]     rs2,
     input  wire [4:0]     rd,
@@ -14,9 +14,12 @@ module register_file(
 
     integer i;
     reg[`RegBus] regs[`RegNum-1 : 0];
+    wire         wen;
+
+    assign wen = (clk1_flag == 1'b1);
 
     //wire register
-    always @(posedge clk, posedge rst) begin
+    always @(posedge clk) begin
         if(rst == `RST_VAL) begin
             for(i=0; i<32; i=i+1) begin
                 regs[i] <= `RegRstVal;  

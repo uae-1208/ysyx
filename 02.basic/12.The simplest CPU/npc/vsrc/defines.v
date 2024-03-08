@@ -8,8 +8,12 @@
 
 
 // E type instruction
-`define INST_TYPE_E 7'b111_0011
-`define INST_EBREAK 12'b0000_0000_0001
+`define INST_TYPE_E   7'b111_0011
+`define INST_EBREAK   12'b0000_0000_0001
+`define HIT_GOOD_TRAP 1
+`define HIT_BAD_TRAP  2
+`define ABORT         3
+
 
 
 // type
@@ -29,7 +33,7 @@
 
 
 // ALU
-`define ADD     1'b0
+`define ADD     1'b1
 `define AlucBus 0:0
 
 

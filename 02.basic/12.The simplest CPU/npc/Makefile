@@ -51,7 +51,7 @@ waveform.vcd: ./obj_dir/V$(MODULE)
 .stamp.verilate: $(VSRCS) $(CSRCS)
 	@echo
 	@echo "### VERILATING ###"
-	verilator -Wno-STMTDLY -Wno-MODDUP --trace --x-assign unique --x-initial unique --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS)
+	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS)
 	@touch .stamp.verilate
 
 

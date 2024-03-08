@@ -1,35 +1,46 @@
 `include "/home/uae/ysyx/ysyx-workbench/npc/vsrc/defines.v"
 
+module clk_count(
+  input  wire clk,
+  input  wire rst,
+  output wire clk1_flag,
+  output wire clk2_flag
+);
+
+  reg [1:0] clk_cnt;
+  always @(posedge clk) begin
+    if(rst == `RST_VAL)
+      clk_cnt <= 2'd0;
+    else if(clk_cnt == 2'd2)
+      clk_cnt <= 2'd0;
+    else
+      clk_cnt <= clk_cnt + 2'd1;
+  end
+
+  assign clk1_flag = (clk_cnt == 2'd1);
+  assign clk2_flag = (clk_cnt == 2'd2);
+
+endmodule
+
+
+
 module PC(
   input  wire           clk,
   input  wire           rst,
+  input  wire           clk2_flag,
   output reg  [`RegBus] pc
 );
 
-  reg [1:0] clk_div4;
-  always @(posedge clk, posedge rst) begin
-    if(rst == `RST_VAL)
-      clk_div4 <= 2'd0;
-    else if(clk_div4 == 2'd3)
-      clk_div4 <= 2'd0;
-    else
-      clk_div4 <= clk_div4 + 2'd1;
-  end
-
-
-  always @(posedge clk, posedge rst) begin
+  always @(posedge clk) begin
     if(rst == `RST_VAL)
       pc <= `RESET_VECTOR;
-    else if(clk_div4 == 2'd0)
+    else if(clk2_flag == 1'b1)
       pc <= pc + `PC_INCREMENT;
   end
 
 endmodule
 
-//uae
-//!!!!!!!!!!!!!!!!!!!!!
-//测试一下rs1和rd相同的情况！！！！！
-//!!!!!!!!!!!!!!!!!!!!!
+
 
 module rv32(
   input  wire           clk,
@@ -38,6 +49,8 @@ module rv32(
   output wire [`RegBus] pc
 );
   
+  wire            clk1_flag;
+  wire            clk2_flag;
   wire [4:0]      rs1;
   wire [4:0]      rs2;
   wire [4:0]      rd;
@@ -54,11 +67,20 @@ module rv32(
   assign num1 = src1;
 
 
+  // clk_count module
+  clk_count clk_count_inst(
+    .clk      (clk),
+    .rst      (rst),
+    .clk1_flag(clk1_flag),
+    .clk2_flag(clk2_flag)
+  );
+
   // PC module
   PC PC_inst(
-    .clk(clk),
-    .rst(rst),
-    .pc (pc)   
+    .clk      (clk),
+    .rst      (rst),
+    .clk2_flag(clk2_flag),
+    .pc       (pc)   
   );
 
   // Control Unit module
@@ -75,15 +97,15 @@ module rv32(
 
   // Register File module
   register_file register_file_inst(
-    .clk   (clk),
-    .rst   (rst),
-    .wen   (1'b1),   //uae
-    .rs1   (rs1),
-    .rs2   (rs2),
-    .rd    (rd),
-    .result(result),
-    .src1  (src1),
-    .src2  (src2)
+    .clk      (clk),
+    .rst      (rst),
+    .clk1_flag(clk1_flag),
+    .rs1      (rs1),
+    .rs2      (rs2),
+    .rd       (rd),
+    .result   (result),
+    .src1     (src1),
+    .src2     (src2)
   );
 
   // Imm Extend module
