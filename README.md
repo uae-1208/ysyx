@@ -7,4 +7,6 @@
 - **2024/3/5** ：绘制整体的框架图，包括`top module`、`regfile module`、`control unit module`
 - **2024/3/6** ：小修了一下框架图，完成简单NPC的RTL代码
 - **2024/3/7** ：修改简单NPC的RTL代码的语法错误，编写tbcpp文件，修改Makefile以适应**bug迭出**的`verilator`(如不弹出所有warning，避免type信号命名一致等)
-- **2024/3/8** ：完成了简单的NPC部分，包括执行`addi`指令和`DPI-C`机制下的`ebreak`指令
+- **2024/3/8** ：完成了简单的NPC部分，包括执行`addi`指令和`DPI-C`机制下的`ebreak`指令（又被`Verilator`折磨了几个小时：在**多.v文件体系**下使用`import "DPI-C" function <return_type> <function_name>(<argument_list>);`时，要将其放在**module内部**，否则又会报重复定义的错。）
+- **2024/3/9** ：学习了`.gtkw`文件的妙用，并在`Makefile`中添加相应的指令。粗略了阅读AM的Makefile。
+- **2024/3/10** ：仔细了阅读AM的`Makefile`和观看了B站视频。在这一天的最后半小时悟到如何通过AM的`Makefile`设置nemu的批处理模式。
