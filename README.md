@@ -10,4 +10,5 @@
 - **2024/3/8** ：完成了简单的NPC部分，包括执行`addi`指令和`DPI-C`机制下的`ebreak`指令（又被`Verilator`折磨了几个小时：在**多.v文件体系**下使用`import "DPI-C" function <return_type> <function_name>(<argument_list>);`时，要将其放在**module内部**，否则又会报重复定义的错。）
 - **2024/3/9** ：学习了`.gtkw`文件的妙用，并在`Makefile`中添加相应的指令。粗略了阅读AM的Makefile。
 - **2024/3/10** ：仔细了阅读AM的`Makefile`和观看了B站视频。在这一天的最后半小时悟到如何通过AM的`Makefile`设置nemu的批处理模式。
-- **2024/3/12** ：完善AM和NEMU的笔记，并且实现了部分的`string.h`。
+- **2024/3/12** ：完善AM和NEMU的笔记，并且实现了部分的`string.c`。
+- **2024/3/13** ：完整实现`string.c`并通过`string` cpu test。
