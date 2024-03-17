@@ -13,3 +13,5 @@
 - **2024/3/12** ：完善AM和NEMU的笔记，并且实现了部分的`string.c`。
 - **2024/3/13** ：完整实现`string.c`并通过`string` cpu test。
 - **2024/3/15** ：实现了`stdio.c`中的`sprintf`系列函数。效率属实有点低。
+- **2024/3/16** ：看B站的elf课程录制，整理Markdown笔记。
+- **2024/3/17** ：修改`nemu.md`和`defect.md`，完成`iringbuf`和`mtrace`。
