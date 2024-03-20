@@ -23,8 +23,13 @@
  * This is useful when you use the `si' command.
  * You can modify this value as you want.
  */
+#define CONFIG_IRINGBUF 1
+#define CONFIG_MTRACE   1
+#define CONFIG_FTRACE   1
 
 /*****************************iringbuf*****************************/
+#ifdef CONFIG_IRINGBUF 
+
 #define MAX_iringbuf_size  20
 struct IRINGBUF
 {
@@ -64,10 +69,12 @@ static void display_iringbuf(void)
   Log("Display inst iringbuf:");
   while(i != iringbuf.tail)
   {
-    printf("\33[1;33m[itrace]\33[0m       %s\n", iringbuf.inst_buf[i]);
+    printf("\33[1;33m[iringbuf]\33[0m       %s\n", iringbuf.inst_buf[i]);
+    log_write("[iringbuf]       %s\n", iringbuf.inst_buf[i]); 
     i = (i + 1) % MAX_iringbuf_size;
   }
-  printf("\33[1;33m[itrace]\33[0m \33[1;31m---->\33[0m %s\n", iringbuf.inst_buf[iringbuf.tail]);
+  printf("\33[1;33m[iringbuf]\33[0m \33[1;31m---->\33[0m %s\n", iringbuf.inst_buf[iringbuf.tail]);
+  log_write("[iringbuf] ----> %s\n", iringbuf.inst_buf[iringbuf.tail]); 
 }
 
 // static void clear_iringbuf(void)
@@ -76,6 +83,19 @@ static void display_iringbuf(void)
 //     if(iringbuf.inst_buf[i] != NULL)
 //       free(iringbuf.inst_buf[i]);
 // }
+
+#endif
+/******************************************************************/
+
+
+/******************************ftrace******************************/
+#ifdef CONFIG_FTRACE 
+
+extern void RET_Log(uint32_t last_PC, uint32_t current_pc);
+extern void J_Log(uint32_t last_PC, uint32_t current_pc);
+#define OPCODE(inst)  ((inst) & 0x7f)
+
+#endif
 /******************************************************************/
 
 
@@ -129,7 +149,21 @@ static void exec_once(Decode *s, vaddr_t pc) {
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
 #endif
 #endif
+
+#ifdef CONFIG_IRINGBUF 
   append_iringbuf(s->logbuf);
+#endif
+
+
+#ifdef CONFIG_FTRACE
+
+  if(s->isa.inst.val == 0x00008067)  //ret
+    RET_Log(s->pc, s->dnpc);
+  else if((OPCODE(s->isa.inst.val)==0b1100111) || (OPCODE(s->isa.inst.val)== 0b1101111))  //jalr or jal
+    J_Log(s->pc, s->dnpc);
+
+#endif
+
 }
 
 static void execute(uint64_t n) {
@@ -178,8 +212,10 @@ void cpu_exec(uint64_t n) {
     case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
 
     case NEMU_END: case NEMU_ABORT:
+#ifdef CONFIG_IRINGBUF 
       display_iringbuf();
       // clear_iringbuf();
+#endif
       Log("nemu: %s at pc = " FMT_WORD,
           (nemu_state.state == NEMU_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
            (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
