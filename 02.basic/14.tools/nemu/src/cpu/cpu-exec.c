@@ -24,7 +24,7 @@
  * You can modify this value as you want.
  */
 #define CONFIG_IRINGBUF 1
-#define CONFIG_MTRACE   1
+// #define CONFIG_MTRACE   1
 #define CONFIG_FTRACE   1
 
 /*****************************iringbuf*****************************/
@@ -154,14 +154,11 @@ static void exec_once(Decode *s, vaddr_t pc) {
   append_iringbuf(s->logbuf);
 #endif
 
-
 #ifdef CONFIG_FTRACE
-
   if(s->isa.inst.val == 0x00008067)  //ret
     RET_Log(s->pc, s->dnpc);
   else if((OPCODE(s->isa.inst.val)==0b1100111) || (OPCODE(s->isa.inst.val)== 0b1101111))  //jalr or jal
     J_Log(s->pc, s->dnpc);
-
 #endif
 
 }

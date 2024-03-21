@@ -18,7 +18,7 @@
 
 
 #define CONFIG_IRINGBUF 1
-#define CONFIG_MTRACE   1
+// #define CONFIG_MTRACE   1
 #define CONFIG_FTRACE   1
 
 

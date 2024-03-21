@@ -17,7 +17,7 @@
 #include <memory/paddr.h>
 
 #define CONFIG_IRINGBUF 1
-#define CONFIG_MTRACE   1
+// #define CONFIG_MTRACE   1
 #define CONFIG_FTRACE   1
 
 void init_rand();
@@ -295,7 +295,6 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Open the log file. */
   init_log(log_file);
-
 
   /* Initialize memory. */
   init_mem();
