@@ -19,3 +19,4 @@
 - **2024/3/20** ：完成了`ftrace`。
 - **2024/3/21** ：完成了`difftest`。
 - **2024/3/23** ：阅读`npc`的makefile文件，给`npc`添加了`auipc`指令。
+- **2024/3/24** ：给`npc`添加了`auipc`、`jal`、`jalr`、`sw`指令，建立了`monitor`和`sdb`框架。
