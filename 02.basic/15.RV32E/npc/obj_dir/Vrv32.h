@@ -33,16 +33,20 @@ VL_MODULE(Vrv32) {
     // LOCAL SIGNALS
     // Internals; generally not touched by application code
     CData/*2:0*/ rv32__DOT__type4;
+    CData/*0:0*/ rv32__DOT__wen;
     CData/*0:0*/ rv32__DOT__m1;
     CData/*0:0*/ rv32__DOT__m2;
     CData/*0:0*/ rv32__DOT__m3;
-    CData/*0:0*/ rv32__DOT__aluc;
+    CData/*0:0*/ rv32__DOT__m4;
+    CData/*1:0*/ rv32__DOT__aluc;
     CData/*1:0*/ rv32__DOT__clk_count_inst__DOT__clk_cnt;
     CData/*0:0*/ rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__hit;
     CData/*0:0*/ rv32__DOT__i1__DOT__i0__DOT__hit;
     CData/*0:0*/ rv32__DOT__i2__DOT__i0__DOT__hit;
+    CData/*0:0*/ rv32__DOT__i4__DOT__i0__DOT__hit;
     SData/*11:0*/ rv32__DOT__imm_extend_inst__DOT__imm_12;
     IData/*31:0*/ rv32__DOT__result;
+    IData/*31:0*/ rv32__DOT__rin;
     IData/*31:0*/ rv32__DOT__src1;
     IData/*31:0*/ rv32__DOT__num1;
     IData/*31:0*/ rv32__DOT__num2;
@@ -50,8 +54,11 @@ VL_MODULE(Vrv32) {
     IData/*31:0*/ rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__lut_out;
     IData/*31:0*/ rv32__DOT__register_file_inst__DOT__i;
     IData/*19:0*/ rv32__DOT__imm_extend_inst__DOT__imm_20;
+    IData/*31:0*/ rv32__DOT__imm_extend_inst__DOT__imm_12_to_32;
+    IData/*31:0*/ rv32__DOT__imm_extend_inst__DOT__imm_20_to_32;
     IData/*31:0*/ rv32__DOT__i1__DOT__i0__DOT__lut_out;
     IData/*31:0*/ rv32__DOT__i2__DOT__i0__DOT__lut_out;
+    IData/*31:0*/ rv32__DOT__i4__DOT__i0__DOT__lut_out;
     QData/*32:0*/ rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__pair_list[2];
     CData/*0:0*/ rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__key_list[2];
     IData/*31:0*/ rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__data_list[2];
@@ -62,12 +69,16 @@ VL_MODULE(Vrv32) {
     QData/*32:0*/ rv32__DOT__i2__DOT__i0__DOT__pair_list[2];
     CData/*0:0*/ rv32__DOT__i2__DOT__i0__DOT__key_list[2];
     IData/*31:0*/ rv32__DOT__i2__DOT__i0__DOT__data_list[2];
+    QData/*32:0*/ rv32__DOT__i4__DOT__i0__DOT__pair_list[2];
+    CData/*0:0*/ rv32__DOT__i4__DOT__i0__DOT__key_list[2];
+    IData/*31:0*/ rv32__DOT__i4__DOT__i0__DOT__data_list[2];
     
     // LOCAL VARIABLES
     // Internals; generally not touched by application code
     CData/*0:0*/ __Vclklast__TOP__clk;
     WData/*65:0*/ rv32__DOT____Vcellinp__i1____pinNumber3[3];
     WData/*65:0*/ rv32__DOT____Vcellinp__i2____pinNumber3[3];
+    WData/*65:0*/ rv32__DOT____Vcellinp__i4____pinNumber3[3];
     WData/*65:0*/ rv32__DOT__PC_inst__DOT____Vcellinp__i3____pinNumber3[3];
     CData/*0:0*/ __Vm_traceActivity[3];
     
@@ -112,9 +123,6 @@ VL_MODULE(Vrv32) {
   private:
     static QData _change_request(Vrv32__Syms* __restrict vlSymsp);
     static QData _change_request_1(Vrv32__Syms* __restrict vlSymsp);
-  public:
-    static void _combo__TOP__2(Vrv32__Syms* __restrict vlSymsp);
-  private:
     void _ctor_var_reset() VL_ATTR_COLD;
   public:
     static void _eval(Vrv32__Syms* __restrict vlSymsp);
@@ -126,6 +134,7 @@ VL_MODULE(Vrv32) {
     static void _eval_initial(Vrv32__Syms* __restrict vlSymsp) VL_ATTR_COLD;
     static void _eval_settle(Vrv32__Syms* __restrict vlSymsp) VL_ATTR_COLD;
     static void _sequent__TOP__1(Vrv32__Syms* __restrict vlSymsp);
+    static void _settle__TOP__2(Vrv32__Syms* __restrict vlSymsp);
   private:
     static void traceChgSub0(void* userp, VerilatedVcd* tracep);
     static void traceChgTop0(void* userp, VerilatedVcd* tracep);

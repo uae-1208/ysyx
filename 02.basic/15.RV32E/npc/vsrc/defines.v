@@ -7,16 +7,26 @@
 `define INST_ADDI 3'b000
 
 
+// S type instruction
+`define INST_TYPE_S 7'b010_0011
+`define INST_SW     3'b010
+
+
 // U type instruction
 `define INST_TYPE_AUIPC 7'b001_0111
+
+
+// JALR type instruction
+`define INST_TYPE_JALR 7'b110_0111
+// JAL type instruction
+`define INST_TYPE_JAL   7'b110_1111
 
 
 // E type instruction
 `define INST_TYPE_E   7'b111_0011
 `define INST_EBREAK   12'b0000_0000_0001
-`define HIT_GOOD_TRAP 1
-`define HIT_BAD_TRAP  2
-`define ABORT         3
+`define HIT_TRAP      1
+`define ABORT         2
 
 
 // type
@@ -34,6 +44,7 @@
 `define MUX1_pc   1'b0
 `define MUX1_src1 1'b1
 
+
 // MUX2
 `define MUX2_src2 1'b0
 `define MUX2_imm  1'b1
@@ -44,9 +55,15 @@
 `define MUX3_result 1'b1
 
 
+// MUX4
+`define MUX4_PCadd4 1'b0
+`define MUX4_result 1'b1
+
+
 // ALU
-`define ADD     1'b1
-`define AlucBus 0:0
+`define ADD       2'b01
+`define ADD_JALR  2'b10
+`define AlucBus   1:0
 
 
 // PC
@@ -55,12 +72,16 @@
 
 
 // RegisterFile
-`define RegRstVal 32'd0
-`define RegBus    31:0
-`define RegNum    32
 `define Reg0      5'd0
 `define Reg0_VAL  32'd0
+`define WDisen    1'b0
+`define WEnable   1'b1
 
 
+// ARCH
+`define BitWidth  32
+`define RegNum    32
+`define RegBus    31:0
+`define RegRstVal 32'd0
 
 

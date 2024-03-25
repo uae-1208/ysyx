@@ -37,7 +37,7 @@ void Vrv32::eval_step() {
             Verilated::debug(1);
             __Vchange = _change_request(vlSymsp);
             Verilated::debug(__Vsaved_debug);
-            VL_FATAL_MT("/home/uae/ysyx/ysyx-workbench/npc/vsrc/rv32.v", 55, "",
+            VL_FATAL_MT("/home/uae/ysyx/ysyx-workbench/npc/vsrc/rv32.v", 57, "",
                 "Verilated model didn't converge\n"
                 "- See DIDNOTCONVERGE in the Verilator manual");
         } else {
@@ -63,7 +63,7 @@ void Vrv32::_eval_initial_loop(Vrv32__Syms* __restrict vlSymsp) {
             Verilated::debug(1);
             __Vchange = _change_request(vlSymsp);
             Verilated::debug(__Vsaved_debug);
-            VL_FATAL_MT("/home/uae/ysyx/ysyx-workbench/npc/vsrc/rv32.v", 55, "",
+            VL_FATAL_MT("/home/uae/ysyx/ysyx-workbench/npc/vsrc/rv32.v", 57, "",
                 "Verilated model didn't DC converge\n"
                 "- See DIDNOTCONVERGE in the Verilator manual");
         } else {
@@ -115,9 +115,10 @@ VL_INLINE_OPT void Vrv32::_sequent__TOP__1(Vrv32__Syms* __restrict vlSymsp) {
         __Vdlyvset__rv32__DOT__register_file_inst__DOT__regs__v0 = 1U;
     } else {
         __Vdlyvval__rv32__DOT__register_file_inst__DOT__regs__v32 
-            = (((1U == (IData)(vlTOPp->rv32__DOT__clk_count_inst__DOT__clk_cnt)) 
+            = ((((1U == (IData)(vlTOPp->rv32__DOT__clk_count_inst__DOT__clk_cnt)) 
+                 & (IData)(vlTOPp->rv32__DOT__wen)) 
                 & (0U != (0x1fU & (vlTOPp->inst >> 7U))))
-                ? vlTOPp->rv32__DOT__result : vlTOPp->rv32__DOT__register_file_inst__DOT__regs
+                ? vlTOPp->rv32__DOT__rin : vlTOPp->rv32__DOT__register_file_inst__DOT__regs
                [(0x1fU & (vlTOPp->inst >> 7U))]);
         __Vdlyvset__rv32__DOT__register_file_inst__DOT__regs__v32 = 1U;
         __Vdlyvdim0__rv32__DOT__register_file_inst__DOT__regs__v32 
@@ -165,35 +166,152 @@ VL_INLINE_OPT void Vrv32::_sequent__TOP__1(Vrv32__Syms* __restrict vlSymsp) {
     }
 }
 
-VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32::_combo__TOP__2\n"); );
+VL_INLINE_OPT void Vrv32::_settle__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32::_settle__TOP__2\n"); );
     Vrv32* const __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
-    // Variables
-    WData/*95:0*/ __Vtemp2[3];
     // Body
-    if ((0x13U == (0x7fU & vlTOPp->inst))) {
-        vlTOPp->rv32__DOT__type4 = 2U;
-        vlTOPp->rv32__DOT__m1 = 1U;
-        vlTOPp->rv32__DOT__m2 = 1U;
-        vlTOPp->rv32__DOT__m3 = 0U;
-        vlTOPp->rv32__DOT__aluc = 1U;
-    } else {
-        if ((0x17U == (0x7fU & vlTOPp->inst))) {
-            vlTOPp->rv32__DOT__type4 = 4U;
-            vlTOPp->rv32__DOT__m1 = 0U;
-            vlTOPp->rv32__DOT__m2 = 1U;
-            vlTOPp->rv32__DOT__m3 = 0U;
-            vlTOPp->rv32__DOT__aluc = 1U;
-        } else {
-            if ((0x73U == (0x7fU & vlTOPp->inst))) {
-                if ((1U == (0xfffU & (vlTOPp->inst 
-                                      >> 0x14U)))) {
-                    vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(1U, vlTOPp->inst);
+    if ((0x40U & vlTOPp->inst)) {
+        if ((0x20U & vlTOPp->inst)) {
+            if ((0x10U & vlTOPp->inst)) {
+                if ((8U & vlTOPp->inst)) {
+                    vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
                 } else {
-                    vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(3U, vlTOPp->inst);
+                    if ((4U & vlTOPp->inst)) {
+                        vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                    } else {
+                        if ((2U & vlTOPp->inst)) {
+                            if ((1U & vlTOPp->inst)) {
+                                if ((1U == (0xfffU 
+                                            & (vlTOPp->inst 
+                                               >> 0x14U)))) {
+                                    vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(1U, vlTOPp->inst);
+                                } else {
+                                    vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                                }
+                            } else {
+                                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                            }
+                        } else {
+                            vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                        }
+                    }
                 }
             } else {
-                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(3U, vlTOPp->inst);
+                if ((8U & vlTOPp->inst)) {
+                    if ((4U & vlTOPp->inst)) {
+                        if ((2U & vlTOPp->inst)) {
+                            if ((1U & vlTOPp->inst)) {
+                                vlTOPp->rv32__DOT__type4 = 6U;
+                                vlTOPp->rv32__DOT__wen = 1U;
+                                vlTOPp->rv32__DOT__m1 = 0U;
+                                vlTOPp->rv32__DOT__m2 = 1U;
+                                vlTOPp->rv32__DOT__m3 = 1U;
+                                vlTOPp->rv32__DOT__m4 = 0U;
+                                vlTOPp->rv32__DOT__aluc = 1U;
+                            } else {
+                                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                            }
+                        } else {
+                            vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                        }
+                    } else {
+                        vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                    }
+                } else {
+                    if ((4U & vlTOPp->inst)) {
+                        if ((2U & vlTOPp->inst)) {
+                            if ((1U & vlTOPp->inst)) {
+                                vlTOPp->rv32__DOT__type4 = 2U;
+                                vlTOPp->rv32__DOT__wen = 1U;
+                                vlTOPp->rv32__DOT__m1 = 1U;
+                                vlTOPp->rv32__DOT__m2 = 1U;
+                                vlTOPp->rv32__DOT__m3 = 1U;
+                                vlTOPp->rv32__DOT__m4 = 0U;
+                                vlTOPp->rv32__DOT__aluc = 2U;
+                            } else {
+                                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                            }
+                        } else {
+                            vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                        }
+                    } else {
+                        vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                    }
+                }
+            }
+        } else {
+            vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+        }
+    } else {
+        if ((0x20U & vlTOPp->inst)) {
+            if ((0x10U & vlTOPp->inst)) {
+                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+            } else {
+                if ((8U & vlTOPp->inst)) {
+                    vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                } else {
+                    if ((4U & vlTOPp->inst)) {
+                        vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                    } else {
+                        if ((2U & vlTOPp->inst)) {
+                            if ((1U & vlTOPp->inst)) {
+                                vlTOPp->rv32__DOT__type4 = 3U;
+                                vlTOPp->rv32__DOT__wen = 0U;
+                                vlTOPp->rv32__DOT__m1 = 1U;
+                                vlTOPp->rv32__DOT__m2 = 1U;
+                                vlTOPp->rv32__DOT__m3 = 0U;
+                                vlTOPp->rv32__DOT__m4 = 1U;
+                                vlTOPp->rv32__DOT__aluc = 1U;
+                            } else {
+                                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                            }
+                        } else {
+                            vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                        }
+                    }
+                }
+            }
+        } else {
+            if ((0x10U & vlTOPp->inst)) {
+                if ((8U & vlTOPp->inst)) {
+                    vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                } else {
+                    if ((4U & vlTOPp->inst)) {
+                        if ((2U & vlTOPp->inst)) {
+                            if ((1U & vlTOPp->inst)) {
+                                vlTOPp->rv32__DOT__type4 = 4U;
+                                vlTOPp->rv32__DOT__wen = 1U;
+                                vlTOPp->rv32__DOT__m1 = 0U;
+                                vlTOPp->rv32__DOT__m2 = 1U;
+                                vlTOPp->rv32__DOT__m3 = 0U;
+                                vlTOPp->rv32__DOT__m4 = 1U;
+                                vlTOPp->rv32__DOT__aluc = 1U;
+                            } else {
+                                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                            }
+                        } else {
+                            vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                        }
+                    } else {
+                        if ((2U & vlTOPp->inst)) {
+                            if ((1U & vlTOPp->inst)) {
+                                vlTOPp->rv32__DOT__type4 = 2U;
+                                vlTOPp->rv32__DOT__wen = 1U;
+                                vlTOPp->rv32__DOT__m1 = 1U;
+                                vlTOPp->rv32__DOT__m2 = 1U;
+                                vlTOPp->rv32__DOT__m3 = 0U;
+                                vlTOPp->rv32__DOT__m4 = 1U;
+                                vlTOPp->rv32__DOT__aluc = 1U;
+                            } else {
+                                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                            }
+                        } else {
+                            vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
+                        }
+                    }
+                }
+            } else {
+                vlTOPp->__Vdpiimwrap_rv32__DOT__control_unit_inst__DOT__ebreak_TOP(2U, vlTOPp->inst);
             }
         }
     }
@@ -203,11 +321,32 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
                                [(0x1fU & (vlTOPp->inst 
                                           >> 0xfU))]);
     vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12 
-        = ((2U == (IData)(vlTOPp->rv32__DOT__type4))
-            ? (0xfffU & (vlTOPp->inst >> 0x14U)) : 0U);
+        = (0xfffU & ((2U == (IData)(vlTOPp->rv32__DOT__type4))
+                      ? (vlTOPp->inst >> 0x14U) : (
+                                                   (3U 
+                                                    == (IData)(vlTOPp->rv32__DOT__type4))
+                                                    ? 
+                                                   ((0xfe0U 
+                                                     & (vlTOPp->inst 
+                                                        >> 0x14U)) 
+                                                    | (0x1fU 
+                                                       & (vlTOPp->inst 
+                                                          >> 7U)))
+                                                    : 0U)));
     vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20 
-        = ((4U == (IData)(vlTOPp->rv32__DOT__type4))
-            ? (0xff000U & vlTOPp->inst) : 0U);
+        = (0xfffffU & ((4U == (IData)(vlTOPp->rv32__DOT__type4))
+                        ? (0xfffff000U & vlTOPp->inst)
+                        : ((6U == (IData)(vlTOPp->rv32__DOT__type4))
+                            ? ((0x100000U & (vlTOPp->inst 
+                                             >> 0xbU)) 
+                               | ((0xf8000U & vlTOPp->inst) 
+                                  | ((0x7000U & vlTOPp->inst) 
+                                     | ((0x800U & (vlTOPp->inst 
+                                                   >> 9U)) 
+                                        | (0x7feU & 
+                                           (vlTOPp->inst 
+                                            >> 0x14U))))))
+                            : 0U)));
     vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[0U] 
         = (IData)((0x100000000ULL | (QData)((IData)(vlTOPp->rv32__DOT__src1))));
     vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[1U] 
@@ -221,71 +360,90 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
                                                        ((QData)((IData)(vlTOPp->pc)) 
                                                         >> 0x20U)) 
                                                << 1U)));
-    __Vtemp2[1U] = ((0xfffffffeU & ((IData)((QData)((IData)(
-                                                            ((0U 
-                                                              == 
-                                                              (0x1fU 
-                                                               & (vlTOPp->inst 
-                                                                  >> 0x14U)))
-                                                              ? 0U
-                                                              : 
-                                                             vlTOPp->rv32__DOT__register_file_inst__DOT__regs
-                                                             [
-                                                             (0x1fU 
-                                                              & (vlTOPp->inst 
-                                                                 >> 0x14U))])))) 
-                                    << 1U)) | (IData)(
-                                                      ((0x100000000ULL 
-                                                        | (QData)((IData)(
-                                                                          ((2U 
-                                                                            == (IData)(vlTOPp->rv32__DOT__type4))
-                                                                            ? 
-                                                                           ((0xfffff000U 
-                                                                             & ((- (IData)(
-                                                                                (1U 
-                                                                                & ((IData)(vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12) 
-                                                                                >> 0xbU)))) 
-                                                                                << 0xcU)) 
-                                                                            | (IData)(vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12))
-                                                                            : 
-                                                                           ((4U 
-                                                                             == (IData)(vlTOPp->rv32__DOT__type4))
-                                                                             ? 
-                                                                            ((0xfff00000U 
-                                                                              & ((- (IData)(
-                                                                                (1U 
-                                                                                & (vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20 
-                                                                                >> 0x13U)))) 
-                                                                                << 0x14U)) 
-                                                                             | vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20)
-                                                                             : 0U))))) 
-                                                       >> 0x20U)));
+    vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12_to_32 
+        = ((0xfffff000U & ((- (IData)((1U & ((IData)(vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12) 
+                                             >> 0xbU)))) 
+                           << 0xcU)) | (IData)(vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12));
+    vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20_to_32 
+        = ((0xfff00000U & ((- (IData)((1U & (vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20 
+                                             >> 0x13U)))) 
+                           << 0x14U)) | vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20);
+    vlTOPp->rv32__DOT__i1__DOT__i0__DOT__pair_list[0U] 
+        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[1U])) 
+                              << 0x20U) | (QData)((IData)(
+                                                          vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[0U]))));
+    vlTOPp->rv32__DOT__i1__DOT__i0__DOT__pair_list[1U] 
+        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[2U])) 
+                              << 0x1fU) | ((QData)((IData)(
+                                                           vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[1U])) 
+                                           >> 1U)));
     vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[0U] 
         = (IData)((0x100000000ULL | (QData)((IData)(
-                                                    ((2U 
-                                                      == (IData)(vlTOPp->rv32__DOT__type4))
+                                                    ((4U 
+                                                      & (IData)(vlTOPp->rv32__DOT__type4))
                                                       ? 
-                                                     ((0xfffff000U 
-                                                       & ((- (IData)(
-                                                                     (1U 
-                                                                      & ((IData)(vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12) 
-                                                                         >> 0xbU)))) 
-                                                          << 0xcU)) 
-                                                      | (IData)(vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12))
-                                                      : 
-                                                     ((4U 
-                                                       == (IData)(vlTOPp->rv32__DOT__type4))
+                                                     ((2U 
+                                                       & (IData)(vlTOPp->rv32__DOT__type4))
                                                        ? 
-                                                      ((0xfff00000U 
-                                                        & ((- (IData)(
-                                                                      (1U 
-                                                                       & (vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20 
-                                                                          >> 0x13U)))) 
-                                                           << 0x14U)) 
-                                                       | vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20)
-                                                       : 0U))))));
+                                                      ((1U 
+                                                        & (IData)(vlTOPp->rv32__DOT__type4))
+                                                        ? 0U
+                                                        : vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20_to_32)
+                                                       : 
+                                                      ((1U 
+                                                        & (IData)(vlTOPp->rv32__DOT__type4))
+                                                        ? vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12_to_32
+                                                        : vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20_to_32))
+                                                      : 
+                                                     ((2U 
+                                                       & (IData)(vlTOPp->rv32__DOT__type4))
+                                                       ? vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12_to_32
+                                                       : 
+                                                      ((1U 
+                                                        & (IData)(vlTOPp->rv32__DOT__type4))
+                                                        ? vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12_to_32
+                                                        : 0U)))))));
     vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[1U] 
-        = __Vtemp2[1U];
+        = ((0xfffffffeU & ((IData)((QData)((IData)(
+                                                   ((0U 
+                                                     == 
+                                                     (0x1fU 
+                                                      & (vlTOPp->inst 
+                                                         >> 0x14U)))
+                                                     ? 0U
+                                                     : 
+                                                    vlTOPp->rv32__DOT__register_file_inst__DOT__regs
+                                                    [
+                                                    (0x1fU 
+                                                     & (vlTOPp->inst 
+                                                        >> 0x14U))])))) 
+                           << 1U)) | (IData)(((0x100000000ULL 
+                                               | (QData)((IData)(
+                                                                 ((4U 
+                                                                   & (IData)(vlTOPp->rv32__DOT__type4))
+                                                                   ? 
+                                                                  ((2U 
+                                                                    & (IData)(vlTOPp->rv32__DOT__type4))
+                                                                    ? 
+                                                                   ((1U 
+                                                                     & (IData)(vlTOPp->rv32__DOT__type4))
+                                                                     ? 0U
+                                                                     : vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20_to_32)
+                                                                    : 
+                                                                   ((1U 
+                                                                     & (IData)(vlTOPp->rv32__DOT__type4))
+                                                                     ? vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12_to_32
+                                                                     : vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_20_to_32))
+                                                                   : 
+                                                                  ((2U 
+                                                                    & (IData)(vlTOPp->rv32__DOT__type4))
+                                                                    ? vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12_to_32
+                                                                    : 
+                                                                   ((1U 
+                                                                     & (IData)(vlTOPp->rv32__DOT__type4))
+                                                                     ? vlTOPp->rv32__DOT__imm_extend_inst__DOT__imm_12_to_32
+                                                                     : 0U)))))) 
+                                              >> 0x20U)));
     vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[2U] 
         = ((1U & ((IData)((QData)((IData)(((0U == (0x1fU 
                                                    & (vlTOPp->inst 
@@ -311,24 +469,6 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
                                                                              >> 0x14U))]))) 
                                                         >> 0x20U)) 
                                                << 1U)));
-    vlTOPp->rv32__DOT__i1__DOT__i0__DOT__pair_list[0U] 
-        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[1U])) 
-                              << 0x20U) | (QData)((IData)(
-                                                          vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[0U]))));
-    vlTOPp->rv32__DOT__i1__DOT__i0__DOT__pair_list[1U] 
-        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[2U])) 
-                              << 0x1fU) | ((QData)((IData)(
-                                                           vlTOPp->rv32__DOT____Vcellinp__i1____pinNumber3[1U])) 
-                                           >> 1U)));
-    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list[0U] 
-        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[1U])) 
-                              << 0x20U) | (QData)((IData)(
-                                                          vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[0U]))));
-    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list[1U] 
-        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[2U])) 
-                              << 0x1fU) | ((QData)((IData)(
-                                                           vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[1U])) 
-                                           >> 1U)));
     vlTOPp->rv32__DOT__i1__DOT__i0__DOT__data_list[0U] 
         = (IData)(vlTOPp->rv32__DOT__i1__DOT__i0__DOT__pair_list
                   [0U]);
@@ -341,18 +481,15 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
     vlTOPp->rv32__DOT__i1__DOT__i0__DOT__key_list[1U] 
         = (1U & (IData)((vlTOPp->rv32__DOT__i1__DOT__i0__DOT__pair_list
                          [1U] >> 0x20U)));
-    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__data_list[0U] 
-        = (IData)(vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list
-                  [0U]);
-    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__data_list[1U] 
-        = (IData)(vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list
-                  [1U]);
-    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__key_list[0U] 
-        = (1U & (IData)((vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list
-                         [0U] >> 0x20U)));
-    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__key_list[1U] 
-        = (1U & (IData)((vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list
-                         [1U] >> 0x20U)));
+    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list[0U] 
+        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[1U])) 
+                              << 0x20U) | (QData)((IData)(
+                                                          vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[0U]))));
+    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list[1U] 
+        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[2U])) 
+                              << 0x1fU) | ((QData)((IData)(
+                                                           vlTOPp->rv32__DOT____Vcellinp__i2____pinNumber3[1U])) 
+                                           >> 1U)));
     vlTOPp->rv32__DOT__i1__DOT__i0__DOT__hit = ((IData)(vlTOPp->rv32__DOT__m1) 
                                                 == 
                                                 vlTOPp->rv32__DOT__i1__DOT__i0__DOT__key_list
@@ -374,6 +511,18 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
                         [1U]))) & vlTOPp->rv32__DOT__i1__DOT__i0__DOT__data_list
             [1U]));
     vlTOPp->rv32__DOT__num1 = vlTOPp->rv32__DOT__i1__DOT__i0__DOT__lut_out;
+    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__data_list[0U] 
+        = (IData)(vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list
+                  [0U]);
+    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__data_list[1U] 
+        = (IData)(vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list
+                  [1U]);
+    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__key_list[0U] 
+        = (1U & (IData)((vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list
+                         [0U] >> 0x20U)));
+    vlTOPp->rv32__DOT__i2__DOT__i0__DOT__key_list[1U] 
+        = (1U & (IData)((vlTOPp->rv32__DOT__i2__DOT__i0__DOT__pair_list
+                         [1U] >> 0x20U)));
     vlTOPp->rv32__DOT__i2__DOT__i0__DOT__hit = ((IData)(vlTOPp->rv32__DOT__m2) 
                                                 == 
                                                 vlTOPp->rv32__DOT__i2__DOT__i0__DOT__key_list
@@ -395,11 +544,33 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
                         [1U]))) & vlTOPp->rv32__DOT__i2__DOT__i0__DOT__data_list
             [1U]));
     vlTOPp->rv32__DOT__num2 = vlTOPp->rv32__DOT__i2__DOT__i0__DOT__lut_out;
-    vlTOPp->rv32__DOT__result = ((IData)(vlTOPp->rv32__DOT__aluc)
+    vlTOPp->rv32__DOT__result = ((1U == (IData)(vlTOPp->rv32__DOT__aluc))
                                   ? (vlTOPp->rv32__DOT__num1 
                                      + vlTOPp->rv32__DOT__num2)
-                                  : (vlTOPp->rv32__DOT__num1 
-                                     + vlTOPp->rv32__DOT__num2));
+                                  : ((2U == (IData)(vlTOPp->rv32__DOT__aluc))
+                                      ? (0xfffffffeU 
+                                         & (vlTOPp->rv32__DOT__num1 
+                                            + vlTOPp->rv32__DOT__num2))
+                                      : (vlTOPp->rv32__DOT__num1 
+                                         + vlTOPp->rv32__DOT__num2)));
+    vlTOPp->rv32__DOT____Vcellinp__i4____pinNumber3[0U] 
+        = (IData)((0x100000000ULL | (QData)((IData)(vlTOPp->rv32__DOT__result))));
+    vlTOPp->rv32__DOT____Vcellinp__i4____pinNumber3[1U] 
+        = ((0xfffffffeU & ((IData)((QData)((IData)(
+                                                   ((IData)(4U) 
+                                                    + vlTOPp->pc)))) 
+                           << 1U)) | (IData)(((0x100000000ULL 
+                                               | (QData)((IData)(vlTOPp->rv32__DOT__result))) 
+                                              >> 0x20U)));
+    vlTOPp->rv32__DOT____Vcellinp__i4____pinNumber3[2U] 
+        = ((1U & ((IData)((QData)((IData)(((IData)(4U) 
+                                           + vlTOPp->pc)))) 
+                  >> 0x1fU)) | (0xfffffffeU & ((IData)(
+                                                       ((QData)((IData)(
+                                                                        ((IData)(4U) 
+                                                                         + vlTOPp->pc))) 
+                                                        >> 0x20U)) 
+                                               << 1U)));
     vlTOPp->rv32__DOT__PC_inst__DOT____Vcellinp__i3____pinNumber3[0U] 
         = (IData)((0x100000000ULL | (QData)((IData)(vlTOPp->rv32__DOT__result))));
     vlTOPp->rv32__DOT__PC_inst__DOT____Vcellinp__i3____pinNumber3[1U] 
@@ -418,6 +589,15 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
                                                                          + vlTOPp->pc))) 
                                                         >> 0x20U)) 
                                                << 1U)));
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__pair_list[0U] 
+        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i4____pinNumber3[1U])) 
+                              << 0x20U) | (QData)((IData)(
+                                                          vlTOPp->rv32__DOT____Vcellinp__i4____pinNumber3[0U]))));
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__pair_list[1U] 
+        = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT____Vcellinp__i4____pinNumber3[2U])) 
+                              << 0x1fU) | ((QData)((IData)(
+                                                           vlTOPp->rv32__DOT____Vcellinp__i4____pinNumber3[1U])) 
+                                           >> 1U)));
     vlTOPp->rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__pair_list[0U] 
         = (0x1ffffffffULL & (((QData)((IData)(vlTOPp->rv32__DOT__PC_inst__DOT____Vcellinp__i3____pinNumber3[1U])) 
                               << 0x20U) | (QData)((IData)(
@@ -427,6 +607,18 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
                               << 0x1fU) | ((QData)((IData)(
                                                            vlTOPp->rv32__DOT__PC_inst__DOT____Vcellinp__i3____pinNumber3[1U])) 
                                            >> 1U)));
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__data_list[0U] 
+        = (IData)(vlTOPp->rv32__DOT__i4__DOT__i0__DOT__pair_list
+                  [0U]);
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__data_list[1U] 
+        = (IData)(vlTOPp->rv32__DOT__i4__DOT__i0__DOT__pair_list
+                  [1U]);
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__key_list[0U] 
+        = (1U & (IData)((vlTOPp->rv32__DOT__i4__DOT__i0__DOT__pair_list
+                         [0U] >> 0x20U)));
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__key_list[1U] 
+        = (1U & (IData)((vlTOPp->rv32__DOT__i4__DOT__i0__DOT__pair_list
+                         [1U] >> 0x20U)));
     vlTOPp->rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__data_list[0U] 
         = (IData)(vlTOPp->rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__pair_list
                   [0U]);
@@ -439,6 +631,27 @@ VL_INLINE_OPT void Vrv32::_combo__TOP__2(Vrv32__Syms* __restrict vlSymsp) {
     vlTOPp->rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__key_list[1U] 
         = (1U & (IData)((vlTOPp->rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__pair_list
                          [1U] >> 0x20U)));
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__hit = ((IData)(vlTOPp->rv32__DOT__m4) 
+                                                == 
+                                                vlTOPp->rv32__DOT__i4__DOT__i0__DOT__key_list
+                                                [0U]);
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__hit = ((IData)(vlTOPp->rv32__DOT__i4__DOT__i0__DOT__hit) 
+                                                | ((IData)(vlTOPp->rv32__DOT__m4) 
+                                                   == 
+                                                   vlTOPp->rv32__DOT__i4__DOT__i0__DOT__key_list
+                                                   [1U]));
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__lut_out = 
+        ((- (IData)(((IData)(vlTOPp->rv32__DOT__m4) 
+                     == vlTOPp->rv32__DOT__i4__DOT__i0__DOT__key_list
+                     [0U]))) & vlTOPp->rv32__DOT__i4__DOT__i0__DOT__data_list
+         [0U]);
+    vlTOPp->rv32__DOT__i4__DOT__i0__DOT__lut_out = 
+        (vlTOPp->rv32__DOT__i4__DOT__i0__DOT__lut_out 
+         | ((- (IData)(((IData)(vlTOPp->rv32__DOT__m4) 
+                        == vlTOPp->rv32__DOT__i4__DOT__i0__DOT__key_list
+                        [1U]))) & vlTOPp->rv32__DOT__i4__DOT__i0__DOT__data_list
+            [1U]));
+    vlTOPp->rv32__DOT__rin = vlTOPp->rv32__DOT__i4__DOT__i0__DOT__lut_out;
     vlTOPp->rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__hit 
         = ((IData)(vlTOPp->rv32__DOT__m3) == vlTOPp->rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__key_list
            [0U]);
@@ -468,7 +681,7 @@ void Vrv32::_eval(Vrv32__Syms* __restrict vlSymsp) {
         vlTOPp->_sequent__TOP__1(vlSymsp);
         vlTOPp->__Vm_traceActivity[1U] = 1U;
     }
-    vlTOPp->_combo__TOP__2(vlSymsp);
+    vlTOPp->_settle__TOP__2(vlSymsp);
     vlTOPp->__Vm_traceActivity[2U] = 1U;
     // Final
     vlTOPp->__Vclklast__TOP__clk = vlTOPp->clk;

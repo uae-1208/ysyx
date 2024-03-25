@@ -2,10 +2,6 @@ MODULE=rv32
 CSRCS = $(shell find $(abspath ./csrc) -name "*.cpp")
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 VSRCS += $(shell find $(abspath ./vsrc/*) -name "*.v")
-INC_PATH = $(NPC_HOME)/include/
-LIBS = -lreadline   # link the <readline> lib
-# LIBS += $(shell llvm-config-11 --libs)
-# CXXFLAGS += $(shell llvm-config-11 --cxxflags) -fPIE
 
 .PHONY:gtkw
 gtkw: uae.gtkw
@@ -33,28 +29,10 @@ waves: waveform.vcd
 	gtkwave waveform.vcd
 
 
-.PHONY:waveform.vcd
 waveform.vcd: ./obj_dir/V$(MODULE)
 	@echo
 	@echo "### SIMULATING ###"
 	@./obj_dir/V$(MODULE) #+verilator+rand+reset+2
-
-
-
-IMG ?=      #loaded by AM Makefile (npc.mk)
-override ARGS ?= --log=./log/npc-log.txt
-BINARY := ./obj_dir/V$(MODULE)
-NEMU_EXEC := $(BINARY) $(ARGS) $(IMG)
-
-
-.PHONY:run-env
-run-env: $(BINARY) $(DIFF_REF_SO)
-
-
-.PHONY:run
-run: run-env
-	$(NEMU_EXEC)
-
 
 
 #This builds our simulation executable from the testbench and the converted sources.
@@ -80,9 +58,7 @@ run: run-env
 .stamp.verilate: $(VSRCS) $(CSRCS)
 	@echo
 	@echo "### VERILATING ###"
-	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH)
-	@echo "LIBS +=$(LIBS)" >> ./obj_dir/V$(MODULE).mk    # to link readline library
-	# @echo "CXXFLAGS +=$(CXXFLAGS)" >> ./obj_dir/V$(MODULE).mk 
+	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS)
 	@touch .stamp.verilate
 
 
@@ -94,7 +70,7 @@ run: run-env
 #----------------------------------------------------------------------------------
 .PHONY:lint
 lint: $(MODULE).v
-	#-lint-only- 告诉 Verilator 进行 lint 但不生成任何仿真输出
+	#-lint-only- 告诉 Verilator 进行 lint 但不生成任何仿真输出]
 	verilator --lint-only $(MODULE).v
 
 
@@ -103,5 +79,4 @@ clean:
 	rm -rf .stamp.*;
 	rm -rf ./obj_dir
 	rm -rf waveform.vcd
-	rm ./log/*
-
+	

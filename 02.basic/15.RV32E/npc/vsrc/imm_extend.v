@@ -2,6 +2,7 @@
 
 module RISB_type(
     input  wire [4:0]       rs2,
+    input  wire [4:0]       rd,
     input  wire [6:0]       funct7,
     input  wire [`TYPE_BUS] type2,
     output reg  [11:0]      imm_12
@@ -10,7 +11,7 @@ module RISB_type(
         case (type2)
             // `INST_R: imm_12 = 12'b0000_0000_0000;
             `INST_I: imm_12 = {funct7, rs2};
-            //`INST_S: imm_12 = {funct7, rd};
+            `INST_S: imm_12 = {funct7, rd};
             //`INST_B: imm_12 = {funct7[6], rd[0], funct7[5:0], rd[4:1]};
             default:imm_12 = 12'b0000_0000_0000; 
         endcase
@@ -28,8 +29,8 @@ module UJ_type(
     always @(*) begin
         case (type2)
             `INST_U: imm_20 = {funct7, rs2, rs1, funct3} << 12;
-            // `INST_J: imm_20 = {funct7, rs2};
-            default:imm_20 = 20'b0000_0000_0000_0000_0000; 
+            `INST_J: imm_20 = {funct7[6], rs1, funct3, rs2[0], funct7[5:0], rs2[4:1]} << 1;
+            default: imm_20 = 20'b0000_0000_0000_0000_0000; 
         endcase
     end
 endmodule
@@ -52,6 +53,7 @@ endmodule
 module imm_extend(
     input  wire [4:0]       rs1,
     input  wire [4:0]       rs2,
+    input  wire [4:0]       rd,
     input  wire [2:0]       funct3,
     input  wire [6:0]       funct7,
     input  wire [`TYPE_BUS] type3,
@@ -65,6 +67,7 @@ module imm_extend(
 
     RISB_type RISB_type_inst(
         .rs2   (rs2),
+        .rd    (rd),
         .funct7(funct7),
         .type2 (type3),
         .imm_12(imm_12)
@@ -91,9 +94,13 @@ module imm_extend(
 
     always @(*) begin
         case (type3)
+            `INST_R: imm32 = imm_12_to_32;
             `INST_I: imm32 = imm_12_to_32;
+            `INST_S: imm32 = imm_12_to_32;
+            `INST_B: imm32 = imm_12_to_32;
             `INST_U: imm32 = imm_20_to_32;
-            default: imm32 = 32'd0;
+            `INST_J: imm32 = imm_20_to_32;
+            default: imm32 = `BitWidth'd0;
         endcase
     end
 endmodule

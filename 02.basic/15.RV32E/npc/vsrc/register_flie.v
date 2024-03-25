@@ -4,28 +4,29 @@ module register_file(
     input  wire           clk,
     input  wire           rst,
     input  wire           clk1_flag,
+    input  wire           wen,
     input  wire [4:0]     rs1,
     input  wire [4:0]     rs2,
     input  wire [4:0]     rd,
-    input  wire [`RegBus] result,
+    input  wire [`RegBus] rin,
     output wire [`RegBus] src1,
     output wire [`RegBus] src2
 );
 
     integer i;
-    reg[`RegBus] regs[`RegNum-1 : 0];
-    wire         wen;
+    reg[`RegBus] regs[`BitWidth-1 : 0];
+    wire         r_wen;
 
-    assign wen = (clk1_flag == 1'b1);
+    assign r_wen = (clk1_flag == 1'b1) & wen;
 
     //wire register
     always @(posedge clk) begin
         if(rst == `RST_VAL) begin
-            for(i=0; i<32; i=i+1) begin
+            for(i=0; i<`RegNum; i=i+1) begin
                 regs[i] <= `RegRstVal;  
             end
-        end else if((wen == 1'b1) && (rd != `Reg0))
-            regs[rd] <= result; 
+        end else if((r_wen == 1'b1) && (rd != `Reg0))
+            regs[rd] <= rin; 
         else
             regs[rd] <= regs[rd]; 
     end

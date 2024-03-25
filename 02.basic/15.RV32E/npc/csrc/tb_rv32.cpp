@@ -5,96 +5,82 @@
 #include "verilated_vcd_c.h"
 #include "Vrv32__Dpi.h"
 #include "svdpi.h"
+#include "../include/common.h"
+#include "../include/utils.h"
 
-
-#define HIT_GOOD_TRAP 1
-#define HIT_BAD_TRAP  2
-#define ABORT         3
 
 
 VerilatedVcdC* tfp = new VerilatedVcdC(); //导出vcd波形需要加此语句
 Vrv32 *top = new Vrv32("top");
 vluint64_t main_time = 0;  //initial 仿真时间
-static const uint32_t inst[] = {
-  0xffc10113,    //addi	sp,sp,-4
-  0x06400593,    //li	  a1,100
-  0x06458613,    //add	a2,a1,100
-  0x0c860693,    //add	a3,a2,200
-  0xed468713,    //add	a4,a3,-300
-  0xe7070793,    //add	a5,a4,-400
-  0x00009117,    //auipc	sp,0x9
-  0x80178813,    //add	a6,a5,-2047
-  0x7fa80893,    //add	a7,a6,2042
-  0x00000517,    //auipc	a0,0x0
-  0x7fa88893,    //add	a7,a7,2042
-  0x00100073,    //ebreak
-  0x06458613,    //add	a2,a1,100
-  0x0c860693,    //add	a3,a2,200
-};
 
- 
-static uint32_t pmem_read(uint32_t pc)
+
+
+/********extern functions or variables********/
+extern NPCState npc_state;
+extern void   init_monitor(int, char *[]);
+extern void   sdb_mainloop() ;
+extern int    is_exit_status_bad();
+extern word_t pmem_read(paddr_t addr, int len); 
+extern void   ebreak(int station, int inst);
+/*********************************************/
+
+#define start_time 4
+
+void ebreak(int station, int inst)
 {
-  if(pc < 0x80000000)
-    return 0;
-  if((pc - 0x80000000) % 4 != 0)
-    return 0;
-
-  return inst[(pc - 0x80000000) / 4];
-}
-
-
-
-extern void ebreak(int station, int inst)
-{
-  switch(station)
-  {
-    case HIT_GOOD_TRAP:
-      printf("\33[1;32m HIT GOOD TRAP \33[0m at pc = 0x%08x   ", top->pc);
-      printf("\33[1;35m Instruction \33[0m = 0x%08x\n", inst);
-      break;
+  if(Verilated::gotFinish())
+    return;
     
-    case HIT_BAD_TRAP:
-      printf("\33[1;31m HIT BAD TRAP\33[0m at pc = 0x%08x   ", top->pc);
-      printf("\33[1;32m Instruction \33[0m = 0x%08x\n", inst);
-      break;
+  if(main_time >= start_time)   // at the begining (main_time < start_time and before the reset), all regs are zeros
+  {
+    npc_state.halt_ret = top->rv32__DOT__register_file_inst__DOT__regs[10]; //a0
+    npc_state.halt_pc = top->pc;
 
-    case ABORT:
-    default:
-      if(main_time >= 4)
-      {
-        printf("\33[1;31m ABORT\33[0m at pc = 0x%08x   ", top->pc);
-        printf("\33[1;32m Instruction \33[0m = 0x%08x\n", inst);
-      }
-      break;
-  }
+    switch(station)
+    {
+      case HIT_TRAP:
+        npc_state.state = NPC_END;
+        break;
 
-  if(main_time >= 4)
+      case ABORT:
+      default:
+        npc_state.state = NPC_ABORT;
+        break;
+    }
+
     Verilated::gotFinish(true);
+  }
 }
 
 
-static void single_cycle(void) 
+static inline word_t inst_fetch(word_t pc, int len)
+{
+  return pmem_read(pc, len);
+}
+
+void single_cycle(void) 
 {
   if(!Verilated::gotFinish())
   { 
     top->clk = 0; top->eval(); tfp->dump(main_time);  main_time++; //推动仿真时间
     top->clk = 1; top->eval(); tfp->dump(main_time);  main_time++; //推动仿真时间
-    top->inst = pmem_read(top->pc);
+    
+    if(main_time >= start_time)   // at the begining (main_time < start_time and before the reset), all regs are zeros
+      top->inst = inst_fetch(top->pc, 4);
   }
 }
-
 
 static void reset(void)
 {
   top->rst = 0; single_cycle();
   top->rst = 1; single_cycle();
-  top->rst = 0; single_cycle();
-  single_cycle(); 
+  top->rst = 0; 
+  // single_cycle();
+  // single_cycle(); 
 }
 
-
-int main(void)
+static void init_verilator(void)
 {
   Verilated::traceEverOn(true); //导出vcd波形需要加此语句
 
@@ -103,16 +89,20 @@ int main(void)
 
   //复位
   reset();
+}
 
-  while(!Verilated::gotFinish())
-  {                                                                                                                                                                                                            
-    single_cycle(); single_cycle(); single_cycle();
-  }
+int main(int argc, char *argv[])
+{
+  init_monitor(argc, argv);
+  init_verilator();
 
-  single_cycle();    
+  /* Receive commands from user. */
+  sdb_mainloop();
 
+  /* End the simulation */
   top->final();
   tfp->close();
   delete top;
-  return 0;
+
+  return is_exit_status_bad();
 }
