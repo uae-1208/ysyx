@@ -7,9 +7,10 @@
 #include <stdlib.h>
 
 
-#define PMEM_SIZE 0x8000000
-#define PMEM_BASE 0x80000000
-#define PG_ALIGN __attribute((aligned(4096)))
+#define PMEM_SIZE   0x8000000
+#define PMEM_BASE   0x80000000
+#define PG_ALIGN    __attribute((aligned(4096)))
+
 
 #define paddr_t   uint32_t
 #define word_t    uint32_t
@@ -27,6 +28,7 @@
 #define CONFIG_FTRACE   1
 #define CONFIG_IRINGBUF 1
 #define MAX_iringbuf_size  20
+// #define CONFIG_DIFFTEST   1
 
 
 #endif

@@ -4,8 +4,26 @@ VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 VSRCS += $(shell find $(abspath ./vsrc/*) -name "*.v")
 INC_PATH = $(NPC_HOME)/include/
 LIBS = -lreadline   # link the <readline> lib
+LIBS += -ldl        # link the <dlfcn> lib
 # LIBS += $(shell llvm-config-11 --libs)
 # CXXFLAGS += $(shell llvm-config-11 --cxxflags) -fPIE
+
+
+
+
+# ifdef CONFIG_DIFFTEST
+DIFF_REF_PATH = $(NEMU_HOME)
+DIFF_REF_SO = $(DIFF_REF_PATH)/build/riscv32-nemu-interpreter-so
+ARGS_DIFF = --diff=$(DIFF_REF_SO)
+
+.PHONY: $(DIFF_REF_SO)
+$(DIFF_REF_SO):
+	$(MAKE) -s -C $(DIFF_REF_PATH) 
+
+# endif
+
+
+
 
 .PHONY:gtkw
 gtkw: uae.gtkw
@@ -16,14 +34,6 @@ gtkw: uae.gtkw
 
 .PHONY:sim
 sim: waveform.vcd
-
-
-.PHONY:verilate
-verilate: .stamp.verilate
-
-
-.PHONY:build
-build: obj_dir/V$(MODULE)
 
 
 .PHONY:waves
@@ -43,6 +53,7 @@ waveform.vcd: ./obj_dir/V$(MODULE)
 
 IMG ?=      #loaded by AM Makefile (npc.mk)
 override ARGS ?= --log=./log/npc-log.txt
+override ARGS += $(ARGS_DIFF)
 BINARY := ./obj_dir/V$(MODULE)
 NEMU_EXEC := $(BINARY) $(ARGS) $(IMG)
 
@@ -56,6 +67,8 @@ run: run-env
 	$(NEMU_EXEC)
 
 
+.PHONY:build
+build: $(BINARY)
 
 #This builds our simulation executable from the testbench and the converted sources.
 #We tell Make to change the working directory to obj_dir, 
@@ -65,6 +78,10 @@ run: run-env
 	@echo
 	@echo "### BUILDING SIM ###"
 	make -C obj_dir -f V$(MODULE).mk V$(MODULE)
+
+
+.PHONY:verilate
+verilate: .stamp.verilate
 
 
 #This converts our .v source to C++ and generates build files 
@@ -81,8 +98,8 @@ run: run-env
 	@echo
 	@echo "### VERILATING ###"
 	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH)
-	@echo "LIBS +=$(LIBS)" >> ./obj_dir/V$(MODULE).mk    # to link readline library
-	# @echo "CXXFLAGS +=$(CXXFLAGS)" >> ./obj_dir/V$(MODULE).mk 
+	@echo "LIBS +=$(LIBS)" >> ./obj_dir/V$(MODULE).mk    # to link readline and dlfcn library
+# @echo "CXXFLAGS +=$(CXXFLAGS)" >> ./obj_dir/V$(MODULE).mk 
 	@touch .stamp.verilate
 
 

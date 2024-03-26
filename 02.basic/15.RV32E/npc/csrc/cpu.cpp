@@ -20,6 +20,10 @@ extern void J_Log(uint32_t pc, uint32_t npc);
 extern void append_iringbuf(char *s);
 extern void display_iringbuf(void);
 #endif
+
+#ifdef CONFIG_DIFFTEST 
+extern void difftest_step(vaddr_t pc, vaddr_t npc);
+#endif
 /*********************************************/
 
 
@@ -27,6 +31,7 @@ extern void display_iringbuf(void);
 static uint64_t g_nr_guest_inst = 0;
 static bool g_print_step = false;
 IFDEF(CONFIG_ITRACE, char logbuf[128]);
+
 
 static struct {
   word_t pc;
@@ -49,14 +54,14 @@ static void execute_once()
 
 #ifdef CONFIG_ITRACE
     char *p = logbuf;
-    p += snprintf(p, sizeof(logbuf), "0x%08x: 0x%08x ", PCSet.pc, top->inst);
+    p += snprintf(p, sizeof(logbuf), "0x%08x: 0x%08x ", PCSet.pc, PCSet.inst);
     *p = '\0';
     // // Log("%s",logbuf);
     // // Log("%ld, 0x%08x %d", logbuf + sizeof(logbuf) - p, PCSet.pc, 4);
     // char temp[64] = {0};
     // uint32_t inst = 0x00000513;
     // void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-    // // disassemble(p, logbuf + sizeof(logbuf) - p, PCSet.pc, (uint8_t *)&top->inst, 4);
+    // // disassemble(p, logbuf + sizeof(logbuf) - p, PCSet.pc, (uint8_t *)&PCSet.inst, 4);
     // disassemble(temp, sizeof(temp), 0x8000000c, (uint8_t *)&inst, 4);
 #endif
 
@@ -82,7 +87,7 @@ static void trace_and_difftest()
         IFDEF(CONFIG_ITRACE, puts(logbuf)); 
 
     // difftest
-//   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+    IFDEF(CONFIG_DIFFTEST, difftest_step(PCSet.pc, PCSet.npc));
 
 }
 
@@ -120,7 +125,7 @@ void cpu_exec(uint64_t n)
 #ifdef CONFIG_IRINGBUF 
             display_iringbuf();
 #endif
-            Log("NPC: %s at pc =  0x%08x",
+            Log("NPC: %s at pc = 0x%08x",
                 (npc_state.state == NPC_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
                 (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
                     ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),

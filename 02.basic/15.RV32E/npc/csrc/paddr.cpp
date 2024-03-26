@@ -1,6 +1,4 @@
 #include "../include/paddr.h"
-#include "../include/macro.h"
-#include "../include/debug.h"
 #include "Vrv32.h"
 
 

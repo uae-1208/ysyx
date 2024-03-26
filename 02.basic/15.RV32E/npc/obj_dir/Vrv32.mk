@@ -40,6 +40,7 @@ VM_USER_LDLIBS = \
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = \
 	cpu \
+	difftest \
 	disasm \
 	expr \
 	log \
@@ -66,6 +67,8 @@ VPATH += $(VM_USER_DIR)
 
 cpu.o: /home/uae/ysyx/ysyx-workbench/npc/csrc/cpu.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+difftest.o: /home/uae/ysyx/ysyx-workbench/npc/csrc/difftest.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 disasm.o: /home/uae/ysyx/ysyx-workbench/npc/csrc/disasm.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 expr.o: /home/uae/ysyx/ysyx-workbench/npc/csrc/expr.cpp
@@ -91,5 +94,4 @@ Vrv32: $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
 
 
 # Verilated -*- Makefile -*-
-LIBS +=-lreadline   
-LIBS +=-lreadline   
+LIBS +=-lreadline    -ldl        

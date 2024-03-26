@@ -17,12 +17,16 @@ vluint64_t main_time = 0;  //initial 仿真时间
 
 
 /********extern functions or variables********/
+extern char *diff_so_file;
+extern int  difftest_port;
+extern long img_size;
 extern NPCState npc_state;
 extern void   init_monitor(int, char *[]);
 extern void   sdb_mainloop() ;
 extern int    is_exit_status_bad();
-extern word_t pmem_read(paddr_t addr, int len); 
 extern void   ebreak(int station, int inst);
+extern void   init_difftest(char *ref_so_file, long img_size, int port);
+extern word_t pmem_read(paddr_t addr, int len); 
 /*********************************************/
 
 #define start_time 4
@@ -87,14 +91,19 @@ static void init_verilator(void)
   top->trace(tfp, 0);
   tfp->open("waveform.vcd"); //打开vcd
 
-  //复位
-  reset();
+  reset();  //复位
 }
 
 int main(int argc, char *argv[])
 {
+  /* Initialize the monitor. */
   init_monitor(argc, argv);
+
+  /* Initialize the verilator. */
   init_verilator();
+
+  /* Initialize differential testing. */
+  init_difftest(diff_so_file, img_size, difftest_port);
 
   /* Receive commands from user. */
   sdb_mainloop();
