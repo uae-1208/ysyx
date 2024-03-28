@@ -3,6 +3,7 @@
 module clk_count(
   input  wire clk,
   input  wire rst,
+  output wire clk0_flag,
   output wire clk1_flag,
   output wire clk2_flag
 );
@@ -17,10 +18,12 @@ module clk_count(
       clk_cnt <= clk_cnt + 2'd1;
   end
 
+  assign clk0_flag = (clk_cnt == 2'd0);
   assign clk1_flag = (clk_cnt == 2'd1);
   assign clk2_flag = (clk_cnt == 2'd2);
 
 endmodule
+
 
 
 
@@ -54,26 +57,66 @@ endmodule
 
 
 
-module rv32(
+
+module pc_reg(
   input  wire           clk,
   input  wire           rst,
-  input  wire [`RegBus] inst,
-  output wire [`RegBus] pc
+  input  wire           clk0_flag,
+  input  wire           clk2_flag,
+  input  wire [`RegBus] mem_rdata,
+  output reg  [`RegBus] inst
+);
+
+  reg  [`RegBus] inst_reg;
+
+  always @(posedge clk) begin
+    if(rst == `RST_VAL)
+      inst_reg <= mem_rdata;
+    else if(clk2_flag == 1'b1)
+      inst_reg <= mem_rdata;
+    else
+      inst_reg <= inst;
+  end
+
+  always @(*) begin
+    if(clk0_flag == 1'b1)
+      inst = mem_rdata;
+    else
+      inst = inst_reg;
+  end
+
+endmodule
+
+
+
+
+
+module rv32(
+  input  wire           clk,
+  input  wire           rst
 );
   
+  wire            clk0_flag;
   wire            clk1_flag;
   wire            clk2_flag;
-  wire [4:0]      rs1;
-  wire [4:0]      rs2;
-  wire [4:0]      rd;
-  wire [2:0]      funct3;
-  wire [6:0]      funct7;
+  wire[4:0]       rs1;
+  wire[4:0]       rs2;
+  wire[4:0]       rd;
+  wire[2:0]       funct3;
+  wire[6:0]       funct7;
+  /* verilator lint_off UNOPTFLAT */
+  wire[`RegBus]   inst;     
+  /* verilator lint_off UNOPTFLAT */
+  wire[`RegBus]   pc;     
   wire[`TYPE_BUS] type4;      //inst type
-  wire            wen;        //RegFile write enable
+  wire            wen_r;      //RegFile write enable
+  wire            wen_m;      //mem write enable
+  wire[7:0]       wmask;      //mem write mask
   wire            m1;         //mux1 sel
   wire            m2;         //mux2 sel
   wire            m3;         //mux3 sel
-  wire            m4;         //mux4 sel
+  wire[1:0]       m4;         //mux4 sel
+  wire            m5;         //mux5 sel
   wire[`AlucBus]  aluc;       //alu operation type, like add, sub...
   wire[`RegBus]   PCadd4;     //pc + 4
   wire[`RegBus]   result;     //alu operation result
@@ -83,6 +126,8 @@ module rv32(
   wire[`RegBus]   imm;        //extended 32 bit immediate
   wire[`RegBus]   num1;       //alu operation number1       
   wire[`RegBus]   num2;       //alu operation number2
+  wire[`RegBus]   raddr;      //mem read address
+  wire[`RegBus]   mem_rdata;  //mem read data
   assign num1 = src1;
 
 
@@ -90,6 +135,7 @@ module rv32(
   clk_count clk_count_inst(
     .clk      (clk),
     .rst      (rst),
+    .clk0_flag(clk0_flag),
     .clk1_flag(clk1_flag),
     .clk2_flag(clk2_flag)
   );
@@ -105,6 +151,27 @@ module rv32(
     .pc       (pc)   
   );
 
+  // pc_reg module
+  pc_reg pc_reg_inst(
+    .clk      (clk),
+    .rst      (rst),
+    .clk0_flag(clk0_flag),
+    .clk2_flag(clk2_flag),
+    .mem_rdata(mem_rdata),
+    .inst     (inst)
+  );
+
+  // mem module
+  mem mem_inst(
+    .valid(1'b1),
+    .wen_m(wen_m & clk1_flag & clk),  //uae:由于上下时钟沿都会更新电路状态，所以不加的 "& clk" 的话pmem_write会执行两次
+    .wmask(wmask),
+    .waddr(result),
+    .wdata(src2),
+    .raddr(raddr),
+    .rdata(mem_rdata)
+  );
+
   // Control Unit module
   control_unit control_unit_inst(
     .inst      (inst),
@@ -115,19 +182,21 @@ module rv32(
     .fun7_31_25(funct7),
     .type1     (type4),
     .aluc      (aluc),
-    .wen       (wen),    
+    .wen_r     (wen_r),    
+    .wen_m     (wen_m),
+    .wmask     (wmask),
     .m1        (m1),    
     .m2        (m2),    
     .m3        (m3),   
-    .m4        (m4)   
+    .m4        (m4),   
+    .m5        (m5) 
   );
 
   // Register File module
   register_file register_file_inst(
     .clk      (clk),
     .rst      (rst),
-    .clk1_flag(clk1_flag),
-    .wen      (wen),
+    .wen_r    (wen_r & clk1_flag),
     .rs1      (rs1),
     .rs2      (rs2),
     .rd       (rd),
@@ -160,9 +229,17 @@ module rv32(
   );
 
   // MUX4 module
-  MuxKey #(2, 1, `BitWidth) i4(rin, m4, {
+  MuxKey #(4, 2, `BitWidth) i4(rin, m4, {
       `MUX4_PCadd4, PCadd4,
-      `MUX4_result, result}
+      `MUX4_result, result,
+      `MUX4_memdat, mem_rdata,
+      `MUX4_IDLE,   32'd0}       //uae
+  );
+  
+  // MUX5 module
+  MuxKey #(2, 1, `BitWidth) i5(raddr, (clk1_flag & m5), {
+      1'b0, pc,
+      1'b1, result}
   );
 
   // ALU module

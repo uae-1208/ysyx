@@ -7,13 +7,21 @@ module RISB_type(
     input  wire [`TYPE_BUS] type2,
     output reg  [11:0]      imm_12
 );
+
+    import "DPI-C" function void ebreak(input int station, input int inst, input byte unit);
+
     always @(*) begin
         case (type2)
-            // `INST_R: imm_12 = 12'b0000_0000_0000;
+            `INST_R: imm_12 = 12'b0000_0000_0000;
             `INST_I: imm_12 = {funct7, rs2};
             `INST_S: imm_12 = {funct7, rd};
             //`INST_B: imm_12 = {funct7[6], rd[0], funct7[5:0], rd[4:1]};
-            default:imm_12 = 12'b0000_0000_0000; 
+            `INST_U,
+            `INST_J: imm_12 = 12'b0000_0000_0000;
+            default: begin
+                        imm_12 = 12'b0000_0000_0000;
+                        ebreak(`ABORT, 32'hdeafbeaf, `Unit_IE);
+                    end
         endcase
     end
 endmodule
@@ -26,11 +34,21 @@ module UJ_type(
     input  wire [`TYPE_BUS] type2,
     output reg  [19:0]      imm_20
 );
+
+    import "DPI-C" function void ebreak(input int station, input int inst, input byte unit);
+
     always @(*) begin
         case (type2)
+            `INST_R,
+            `INST_I,
+            `INST_S,
+            `INST_B: imm_20 = 20'b0000_0000_0000_0000_0000;
             `INST_U: imm_20 = {funct7, rs2, rs1, funct3} << 12;
             `INST_J: imm_20 = {funct7[6], rs1, funct3, rs2[0], funct7[5:0], rs2[4:1]} << 1;
-            default: imm_20 = 20'b0000_0000_0000_0000_0000; 
+            default: begin
+                        imm_20 = 20'b0000_0000_0000_0000_0000;
+                        ebreak(`ABORT, 32'hdeafbeaf, `Unit_IE);
+                    end 
         endcase
     end
 endmodule
@@ -59,6 +77,8 @@ module imm_extend(
     input  wire [`TYPE_BUS] type3,
     output reg  [`RegBus]   imm32
 );
+
+    import "DPI-C" function void ebreak(input int station, input int inst, input byte unit);
 
     wire[11:0]    imm_12;
     wire[19:0]    imm_20;
@@ -94,13 +114,12 @@ module imm_extend(
 
     always @(*) begin
         case (type3)
-            `INST_R: imm32 = imm_12_to_32;
-            `INST_I: imm32 = imm_12_to_32;
-            `INST_S: imm32 = imm_12_to_32;
-            `INST_B: imm32 = imm_12_to_32;
-            `INST_U: imm32 = imm_20_to_32;
-            `INST_J: imm32 = imm_20_to_32;
-            default: imm32 = `BitWidth'd0;
+            `INST_R, `INST_I, `INST_S, `INST_B:  imm32 = imm_12_to_32;
+            `INST_U, `INST_J:                    imm32 = imm_20_to_32;
+            default: begin
+                        imm32 = 32'd0;
+                        ebreak(`ABORT, 32'hdeafbeaf, `Unit_IE);
+                    end
         endcase
     end
 endmodule

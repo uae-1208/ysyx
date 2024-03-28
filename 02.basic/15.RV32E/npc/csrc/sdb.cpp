@@ -196,7 +196,7 @@ static char* rl_gets()
         line_read = NULL;
     }
 
-    line_read = readline("(base) " ANSI_FG_GREEN "npc@uae: " ANSI_NONE);
+    line_read = readline("(ysyx)--" ANSI_FG_GREEN "npc@uae: " ANSI_NONE);
     if (line_read && *line_read) 
         add_history(line_read);
 

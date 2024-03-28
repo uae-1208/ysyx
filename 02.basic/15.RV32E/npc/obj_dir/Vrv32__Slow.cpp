@@ -61,23 +61,33 @@ void Vrv32::_ctor_var_reset() {
     // Body
     clk = VL_RAND_RESET_I(1);
     rst = VL_RAND_RESET_I(1);
-    inst = VL_RAND_RESET_I(32);
-    pc = VL_RAND_RESET_I(32);
+    rv32__DOT__inst = VL_RAND_RESET_I(32);
+    rv32__DOT__pc = VL_RAND_RESET_I(32);
     rv32__DOT__type4 = VL_RAND_RESET_I(3);
-    rv32__DOT__wen = VL_RAND_RESET_I(1);
+    rv32__DOT__wen_r = VL_RAND_RESET_I(1);
+    rv32__DOT__wen_m = VL_RAND_RESET_I(1);
+    rv32__DOT__wmask = VL_RAND_RESET_I(8);
     rv32__DOT__m1 = VL_RAND_RESET_I(1);
     rv32__DOT__m2 = VL_RAND_RESET_I(1);
     rv32__DOT__m3 = VL_RAND_RESET_I(1);
-    rv32__DOT__m4 = VL_RAND_RESET_I(1);
+    rv32__DOT__m4 = VL_RAND_RESET_I(2);
+    rv32__DOT__m5 = VL_RAND_RESET_I(1);
     rv32__DOT__aluc = VL_RAND_RESET_I(2);
     rv32__DOT__result = VL_RAND_RESET_I(32);
     rv32__DOT__rin = VL_RAND_RESET_I(32);
     rv32__DOT__src1 = VL_RAND_RESET_I(32);
+    rv32__DOT__src2 = VL_RAND_RESET_I(32);
+    rv32__DOT__imm = VL_RAND_RESET_I(32);
     rv32__DOT__num1 = VL_RAND_RESET_I(32);
     rv32__DOT__num2 = VL_RAND_RESET_I(32);
+    rv32__DOT__raddr = VL_RAND_RESET_I(32);
+    rv32__DOT__mem_rdata = VL_RAND_RESET_I(32);
+    rv32__DOT____Vcellinp__mem_inst__wen_m = VL_RAND_RESET_I(1);
     VL_RAND_RESET_W(66, rv32__DOT____Vcellinp__i1____pinNumber3);
     VL_RAND_RESET_W(66, rv32__DOT____Vcellinp__i2____pinNumber3);
-    VL_RAND_RESET_W(66, rv32__DOT____Vcellinp__i4____pinNumber3);
+    VL_RAND_RESET_W(136, rv32__DOT____Vcellinp__i4____pinNumber3);
+    VL_RAND_RESET_W(66, rv32__DOT____Vcellinp__i5____pinNumber3);
+    rv32__DOT____Vcellinp__i5____pinNumber2 = VL_RAND_RESET_I(1);
     rv32__DOT__clk_count_inst__DOT__clk_cnt = VL_RAND_RESET_I(2);
     rv32__DOT__PC_inst__DOT__pc_temp = VL_RAND_RESET_I(32);
     VL_RAND_RESET_W(66, rv32__DOT__PC_inst__DOT____Vcellinp__i3____pinNumber3);
@@ -92,6 +102,7 @@ void Vrv32::_ctor_var_reset() {
     }
     rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__lut_out = VL_RAND_RESET_I(32);
     rv32__DOT__PC_inst__DOT__i3__DOT__i0__DOT__hit = VL_RAND_RESET_I(1);
+    rv32__DOT__pc_reg_inst__DOT__inst_reg = VL_RAND_RESET_I(32);
     rv32__DOT__register_file_inst__DOT__i = VL_RAND_RESET_I(32);
     for (int __Vi0=0; __Vi0<32; ++__Vi0) {
         rv32__DOT__register_file_inst__DOT__regs[__Vi0] = VL_RAND_RESET_I(32);
@@ -122,17 +133,30 @@ void Vrv32::_ctor_var_reset() {
     }
     rv32__DOT__i2__DOT__i0__DOT__lut_out = VL_RAND_RESET_I(32);
     rv32__DOT__i2__DOT__i0__DOT__hit = VL_RAND_RESET_I(1);
-    for (int __Vi0=0; __Vi0<2; ++__Vi0) {
-        rv32__DOT__i4__DOT__i0__DOT__pair_list[__Vi0] = VL_RAND_RESET_Q(33);
+    for (int __Vi0=0; __Vi0<4; ++__Vi0) {
+        rv32__DOT__i4__DOT__i0__DOT__pair_list[__Vi0] = VL_RAND_RESET_Q(34);
     }
-    for (int __Vi0=0; __Vi0<2; ++__Vi0) {
-        rv32__DOT__i4__DOT__i0__DOT__key_list[__Vi0] = VL_RAND_RESET_I(1);
+    for (int __Vi0=0; __Vi0<4; ++__Vi0) {
+        rv32__DOT__i4__DOT__i0__DOT__key_list[__Vi0] = VL_RAND_RESET_I(2);
     }
-    for (int __Vi0=0; __Vi0<2; ++__Vi0) {
+    for (int __Vi0=0; __Vi0<4; ++__Vi0) {
         rv32__DOT__i4__DOT__i0__DOT__data_list[__Vi0] = VL_RAND_RESET_I(32);
     }
     rv32__DOT__i4__DOT__i0__DOT__lut_out = VL_RAND_RESET_I(32);
     rv32__DOT__i4__DOT__i0__DOT__hit = VL_RAND_RESET_I(1);
+    for (int __Vi0=0; __Vi0<2; ++__Vi0) {
+        rv32__DOT__i5__DOT__i0__DOT__pair_list[__Vi0] = VL_RAND_RESET_Q(33);
+    }
+    for (int __Vi0=0; __Vi0<2; ++__Vi0) {
+        rv32__DOT__i5__DOT__i0__DOT__key_list[__Vi0] = VL_RAND_RESET_I(1);
+    }
+    for (int __Vi0=0; __Vi0<2; ++__Vi0) {
+        rv32__DOT__i5__DOT__i0__DOT__data_list[__Vi0] = VL_RAND_RESET_I(32);
+    }
+    rv32__DOT__i5__DOT__i0__DOT__lut_out = VL_RAND_RESET_I(32);
+    rv32__DOT__i5__DOT__i0__DOT__hit = VL_RAND_RESET_I(1);
+    __Vfunc_rv32__DOT__mem_inst__DOT__pmem_read__0__Vfuncout = 0;
+    __Vchglast__TOP__rv32__DOT__mem_rdata = VL_RAND_RESET_I(32);
     for (int __Vi0=0; __Vi0<3; ++__Vi0) {
         __Vm_traceActivity[__Vi0] = VL_RAND_RESET_I(1);
     }

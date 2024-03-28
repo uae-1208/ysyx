@@ -16,9 +16,9 @@
 #include <isa.h>
 #include <memory/paddr.h>
 
-// #define CONFIG_IRINGBUF 1
+#define CONFIG_IRINGBUF 1
 // #define CONFIG_MTRACE   1
-// #define CONFIG_FTRACE   1
+#define CONFIG_FTRACE   1
 
 void init_rand();
 void init_log(const char *log_file);
@@ -32,7 +32,7 @@ static void welcome() {
     Log("ITrace:   %s", MUXDEF(CONFIG_ITRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
     Log("MTrace:   %s", MUXDEF(CONFIG_MTRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
     Log("FTrace:   %s", MUXDEF(CONFIG_FTRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
-    // Log("IRingBuf: %s", MUXDEF(CONFIG_IRINGBUF, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
+    Log("IRingBuf: %s", MUXDEF(CONFIG_IRINGBUF, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
     Log("DiffTest: %s", MUXDEF(CONFIG_DIFFTEST, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
   IFDEF(CONFIG_TRACE, Log("If trace is enabled, a log file will be generated "
         "to record the trace. This may lead to a large log file. "

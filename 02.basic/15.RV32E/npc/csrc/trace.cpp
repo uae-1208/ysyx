@@ -167,8 +167,10 @@ void load_elf(void)
     for(int i = 0; i < func_amount; i++)
     {
         Get_sym_name(sym_fun_group[i].name_index, sym_fun_group[i].name);
-        printf(ANSI_FG_BLUE " %-10s" ANSI_NONE "   addr: 0x%08x   size: %d\n", sym_fun_group[i].name, sym_fun_group[i].value, sym_fun_group[i].size);
-        fprintf(ftrace_log, " %-10s   addr: 0x%08x   size: %d\n", sym_fun_group[i].name, sym_fun_group[i].value, sym_fun_group[i].size); 
+        printf(ANSI_FG_BLUE " %-10s" ANSI_NONE "   addr: 0x%08x   size: %d\n", 
+               sym_fun_group[i].name, sym_fun_group[i].value, sym_fun_group[i].size);
+        fprintf(ftrace_log, " %-10s   addr: 0x%08x   size: %d\n", 
+                sym_fun_group[i].name, sym_fun_group[i].value, sym_fun_group[i].size); 
     }
 
     fprintf(ftrace_log, "\n\n");
@@ -220,7 +222,8 @@ void display_iringbuf(void)
         log_write("[iringbuf]       %s\n", iringbuf.inst_buf[i]); 
         i = (i + 1) % MAX_iringbuf_size;
     }
-    printf(ANSI_FG_YELLOW "[iringbuf] " ANSI_NONE ANSI_FG_RED "---->" ANSI_NONE " %s\n", iringbuf.inst_buf[iringbuf.tail]);
+    printf(ANSI_FG_YELLOW "[iringbuf] " ANSI_NONE ANSI_FG_RED "---->" ANSI_NONE " %s\n", 
+           iringbuf.inst_buf[iringbuf.tail]);
     log_write("[iringbuf] ----> %s\n", iringbuf.inst_buf[iringbuf.tail]); 
 }
 #endif

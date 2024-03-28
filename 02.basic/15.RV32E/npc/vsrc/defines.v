@@ -2,9 +2,20 @@
 `define RST_VAL 1'b1
 
 
+// R type instruction
+`define INST_TYPE_R 7'b011_0011
+`define INST_ADD    3'b000
+`define INST_SUB    3'b000
+
+
 // I type instruction
 `define INST_TYPE_I 7'b001_0011
-`define INST_ADDI 3'b000
+`define INST_ADDI   3'b000
+
+
+// L type instruction
+`define INST_TYPE_L 7'b000_0011
+`define INST_LW     3'b010
 
 
 // S type instruction
@@ -27,7 +38,9 @@
 `define INST_EBREAK   12'b0000_0000_0001
 `define HIT_TRAP      1
 `define ABORT         2
-
+`define Unit_ALU      1
+`define Unit_CU       2   //contril unit
+`define Unit_IE       3   //imm extended unit
 
 // type
 `define TYPE_BUS 2:0
@@ -56,13 +69,21 @@
 
 
 // MUX4
-`define MUX4_PCadd4 1'b0
-`define MUX4_result 1'b1
+`define MUX4_PCadd4 2'd0
+`define MUX4_result 2'd1
+`define MUX4_memdat 2'd2
+`define MUX4_IDLE   2'd3
+
+
+// MUX5
+`define MUX5_pc     1'b0
+`define MUX5_result 1'b1
 
 
 // ALU
 `define ADD       2'b01
-`define ADD_JALR  2'b10
+`define SUB       2'b10
+`define ADD_JALR  2'b11
 `define AlucBus   1:0
 
 
@@ -76,6 +97,14 @@
 `define Reg0_VAL  32'd0
 `define WDisen    1'b0
 `define WEnable   1'b1
+
+
+// mem
+`define WDisen    1'b0
+`define WEnable   1'b1
+`define WByte     8'b0000_0001
+`define WHalf     8'b0000_0011
+`define WWord     8'b0000_1111
 
 
 // ARCH
