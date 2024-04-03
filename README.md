@@ -24,3 +24,4 @@
 - **2024/3/26** ：为`nemu`添加了`REF DiffTest`接口，为`npc`添加了`DiffTest`框架并验证`dummy`程序执行的正确性。  
 - **2024/3/27** ：为`npc`添加了`FTrace`。  
 - **2024/3/28** ：为`npc`添加了`add, sub, lw, sw`四条指令。  
+- **2024/4/3** ：为`npc`添加了`sltiu, beq, bne, sltu, xor,or,sh,srai`8条指令。  
