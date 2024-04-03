@@ -19,9 +19,22 @@
 // npc trap
 #define HIT_TRAP  1
 #define ABORT     2
-#define Unit_ALU  1
-#define Unit_CU   2   //contril unit
-#define Unit_IE   3   //imm extended unit
+#define Unit_ALU      0
+#define Unit_CU1      1   //contril unit
+#define Unit_CU2      2   
+#define Unit_CU3      3   
+#define Unit_CU4      4   
+#define Unit_CU5      5   
+#define Unit_CU6      6   
+#define Unit_CU7      7   
+#define Unit_CU8      8   
+#define Unit_CU9      9   
+#define Unit_CU10     10   
+#define Unit_CU11     11   
+#define Unit_CU12     12  
+#define Unit_IE1      13   //imm extended unit
+#define Unit_IE2      14  
+#define Unit_IE3      15 
 
 // npc mem wirte mask
 #define WByte  0b00000001

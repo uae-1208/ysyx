@@ -3,7 +3,7 @@
 module register_file(
     input  wire           clk,
     input  wire           rst,
-    input  wire           wen_r,
+    input  wire           wen_reg,
     input  wire [4:0]     rs1,
     input  wire [4:0]     rs2,
     input  wire [4:0]     rd,
@@ -16,7 +16,7 @@ module register_file(
     reg[`RegBus] regs[`BitWidth-1 : 0];
     wire         wen;
 
-    assign wen = wen_r;
+    assign wen = wen_reg;
 
     //wire register
     always @(posedge clk) begin

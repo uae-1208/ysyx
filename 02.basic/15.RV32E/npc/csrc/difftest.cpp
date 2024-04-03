@@ -68,13 +68,16 @@ void init_difftest(char *ref_so_file, long img_size, int port)
 }
 
 
-bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
+bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) 
+{
+    bool success = true;
+
     //check pc
     if(ref_r->pc != pc)
     {
         _Log(ANSI_FG_YELLOW "[difftest]" ANSI_NONE   ANSI_FG_RED "pc" 
              ANSI_NONE "  dut:0x%08x   ref:0x%08x\n", pc, ref_r->pc);
-        return false;
+        success = false;
     }
 
     //check general purpose registers
@@ -83,10 +86,10 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
         {
             _Log(ANSI_FG_YELLOW "[difftest]" ANSI_NONE   ANSI_FG_RED "%s" 
                  ANSI_NONE "  dut:0x%08x   ref:0x%08x\n", ref_regs[i], top_regs[i], ref_r->gpr[i]);
-            return false;
+            success = false;
         }
         
-    return true;
+    return success;
 }
 
 static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc) 

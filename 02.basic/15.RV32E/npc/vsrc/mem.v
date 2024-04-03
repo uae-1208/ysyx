@@ -2,7 +2,7 @@
 
 module mem(
     input  wire           valid,
-    input  wire           wen_m,
+    input  wire           wen_mem,
     input  wire [7:0]     wmask,
     input  wire [`RegBus] waddr,
     input  wire [`RegBus] wdata,
@@ -10,7 +10,7 @@ module mem(
     output reg  [`RegBus] rdata
 );
     wire         wen;
-    assign wen = wen_m;
+    assign wen = wen_mem;
 
 
     import "DPI-C" function int  pmem_read(input int raddr);

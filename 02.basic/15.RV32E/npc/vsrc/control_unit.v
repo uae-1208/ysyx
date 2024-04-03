@@ -9,14 +9,15 @@ module control_unit(
     output wire [6:0]       fun7_31_25,
     output reg  [`TYPE_BUS] type1,      //inst type
     output reg  [`AlucBus]  aluc,       //alu operation typp
-    output reg              wen_r,      //RegFile write enable
-    output reg              wen_m,      //mem write enable
+    output reg              wen_reg,    //RegFile write enable
+    output reg              wen_mem,    //mem write enable
     output reg  [7:0]       wmask,      //mem write mask
     output reg              m1,         //mux1 sel
     output reg              m2,         //mux2 sel
     output reg              m3,         //mux3 sel
     output reg  [1:0]       m4,         //mux4 sel
-    output reg              m5          //mux5 sel
+    output reg              m5,         //mux5 sel
+    output reg              m6          //mux6 sel
 );
 
     import "DPI-C" function void ebreak(input int station, input int inst, input byte unit);
@@ -31,118 +32,154 @@ module control_unit(
     always @(*) begin
         case(opcode_6_0)
             `INST_TYPE_R: begin
-                type1 = `INST_R;   
-                wen_r = `WDisen;   
-                wen_m = `WDisen;   
-                wmask = `WWord;   
-                m1    = `MUX1_src1;
-                m2    = `MUX2_src2;
-                m3    = `MUX3_PCadd4;
-                m4    = `MUX4_result;
-                m5    = `MUX5_pc;
+                type1   = `INST_R;   
+                wen_reg = `WEnable;   
+                wen_mem = `WDisen;   
+                wmask   = `WWord;   
+                m1      = `MUX1_src1;
+                m2      = `MUX2_src2;
+                m3      = `MUX3_PCadd4;
+                m4      = `MUX4_result;
+                m5      = `MUX5_pc;
+                m6      = `MUX6_PCadd4;
                 if(fun7_31_25 == 7'b000_0000) begin
                     case (fun3_14_12)
-                        `INST_ADD: aluc = `ADD;
-                        default:   ebreak(`ABORT, inst, `Unit_CU); //uae
+                        `INST_ADD:  aluc = `ADD;
+                        `INST_SLTU: aluc = `SLTU;
+                        `INST_XOR:  aluc = `XOR;
+                        `INST_OR:   aluc = `OR;
+                        default:    ebreak(`ABORT, inst, `Unit_CU1); //uae
                     endcase                
                 end else if(fun7_31_25 == 7'b010_0000) begin
                     case (fun3_14_12)
                         `INST_SUB: aluc = `SUB;
-                        default:   ebreak(`ABORT, inst, `Unit_CU); //uae
+                        default:   ebreak(`ABORT, inst, `Unit_CU2); //uae
                     endcase  
                 end else begin
-                    ebreak(`ABORT, inst, `Unit_CU);  //uae
+                    ebreak(`ABORT, inst, `Unit_CU3);  //uae
                 end
             end
             `INST_TYPE_I: begin
-                type1 = `INST_I;   
-                wen_r = `WEnable;   
-                wen_m = `WDisen;   
-                wmask = `WWord;   
-                m1    = `MUX1_src1;
-                m2    = `MUX2_imm;
-                m3    = `MUX3_PCadd4;
-                m4    = `MUX4_result;
-                m5    = `MUX5_pc;
+                type1   = `INST_I;   
+                wen_reg = `WEnable;   
+                wen_mem = `WDisen;   
+                wmask   = `WWord;   
+                m1      = `MUX1_src1;
+                m2      = `MUX2_imm;
+                m3      = `MUX3_PCadd4;
+                m4      = `MUX4_result;
+                m5      = `MUX5_pc;
+                m6      = `MUX6_PCadd4;
                 case (fun3_14_12)
-                    `INST_ADDI: aluc = `ADD;
-                    default:    ebreak(`ABORT, inst, `Unit_CU);  //uae
+                    `INST_ADDI:  aluc = `ADD;
+                    `INST_SLTIU: aluc = `SLTU;
+                    `INST_SRLAI:begin 
+                                    case (fun7_31_25)
+                                        // 7'b000_0000: aluc = `SRL;
+                                        7'b010_0000: aluc = `SRA;
+                                        default: ebreak(`ABORT, inst, `Unit_CU4);  //uae
+                                    endcase
+                                end 
+                     default:     ebreak(`ABORT, inst, `Unit_CU5);  //uae
                 endcase
-            end
+            end          
             `INST_TYPE_L: begin
-                type1 = `INST_I;   
-                wen_r = `WEnable;   
-                wen_m = `WDisen;   
-                wmask = `WWord;   
-                m1    = `MUX1_src1;
-                m2    = `MUX2_imm;
-                m3    = `MUX3_PCadd4;
-                m4    = `MUX4_memdat;
-                m5    = `MUX5_result;
+                type1   = `INST_I;   
+                wen_reg = `WEnable;   
+                wen_mem = `WDisen;   
+                wmask   = `WWord;   
+                m1      = `MUX1_src1;
+                m2      = `MUX2_imm;
+                m3      = `MUX3_PCadd4;
+                m4      = `MUX4_memdat;
+                m5      = `MUX5_result;
+                m6      = `MUX6_PCadd4;
                 case (fun3_14_12)
                     `INST_LW: aluc = `ADD;
-                    default:  ebreak(`ABORT, inst, `Unit_CU);  //uae
+                    default:  ebreak(`ABORT, inst, `Unit_CU7);  //uae
                 endcase
             end
             `INST_TYPE_S: begin
-                type1 = `INST_S;   
-                wen_r = `WDisen;   
-                wen_m = `WEnable;   
-                wmask = `WWord;   
-                m1    = `MUX1_src1;
-                m2    = `MUX2_imm;
-                m3    = `MUX3_PCadd4;
-                m4    = `MUX4_result;
-                m5    = `MUX5_pc;
+                type1   = `INST_S;   
+                wen_reg = `WDisen;   
+                wen_mem = `WEnable;   
+                m1      = `MUX1_src1;
+                m2      = `MUX2_imm;
+                m3      = `MUX3_PCadd4;
+                m4      = `MUX4_result;
+                m5      = `MUX5_pc;
+                m6      = `MUX6_PCadd4;
+                aluc    = `ADD;
                 case (fun3_14_12)
-                    `INST_SW: aluc = `ADD;
-                    default:  ebreak(`ABORT, inst, `Unit_CU);  //uae
+                    `INST_SH: wmask = `WHalf;
+                    `INST_SW: wmask = `WWord;
+                    default:  ebreak(`ABORT, inst, `Unit_CU8);  //uae
+                endcase
+            end
+            `INST_TYPE_B: begin
+                type1   = `INST_B;   
+                wen_reg = `WDisen;   
+                wen_mem = `WDisen;   
+                wmask   = `WWord;   
+                m1      = `MUX1_src1;
+                m2      = `MUX2_src2;
+                m3      = `MUX3_PCadd4;
+                m4      = `MUX4_result;
+                m5      = `MUX5_pc;
+                m6      = `MUX6_bump;
+                case (fun3_14_12)
+                    `INST_BEQ: aluc = `BEQ;
+                    `INST_BNE: aluc = `BNE;
+                    default:   ebreak(`ABORT, inst, `Unit_CU9);  //uae
                 endcase
             end
             `INST_TYPE_AUIPC: begin
-                type1 = `INST_U;   
-                wen_r = `WEnable;   
-                wen_m = `WDisen;   
-                wmask = `WWord;   
-                m1    = `MUX1_pc;
-                m2    = `MUX2_imm;
-                m3    = `MUX3_PCadd4;
-                m4    = `MUX4_result;
-                m5    = `MUX5_pc;
-                aluc  = `ADD;
+                type1   = `INST_U;   
+                wen_reg = `WEnable;   
+                wen_mem = `WDisen;   
+                wmask   = `WWord;   
+                m1      = `MUX1_pc;
+                m2      = `MUX2_imm;
+                m3      = `MUX3_PCadd4;
+                m4      = `MUX4_result;
+                m5      = `MUX5_pc;
+                m6      = `MUX6_PCadd4;
+                aluc    = `ADD;
             end
             `INST_TYPE_JALR: begin
-                type1 = `INST_I;   
-                wen_r = `WEnable;   
-                wen_m = `WDisen;   
-                wmask = `WWord;   
-                m1    = `MUX1_src1;
-                m2    = `MUX2_imm;
-                m3    = `MUX3_result;
-                m4    = `MUX4_PCadd4;
-                m5    = `MUX5_pc;
-                aluc  = `ADD_JALR;
+                type1   = `INST_I;   
+                wen_reg = `WEnable;   
+                wen_mem = `WDisen;   
+                wmask   = `WWord;   
+                m1      = `MUX1_src1;
+                m2      = `MUX2_imm;
+                m3      = `MUX3_result;
+                m4      = `MUX4_PCadd4;
+                m5      = `MUX5_pc;
+                m6      = `MUX6_PCadd4;
+                aluc    = `ADD_JALR;
             end            
             `INST_TYPE_JAL: begin
-                type1 = `INST_J;   
-                wen_r = `WEnable;   
-                wen_m = `WDisen;   
-                wmask = `WWord;   
-                m1    = `MUX1_pc;
-                m2    = `MUX2_imm;
-                m3    = `MUX3_result;
-                m4    = `MUX4_PCadd4;
-                aluc  = `ADD;
-                m5    = `MUX5_pc;
+                type1   = `INST_J;   
+                wen_reg = `WEnable;   
+                wen_mem = `WDisen;   
+                wmask   = `WWord;   
+                m1      = `MUX1_pc;
+                m2      = `MUX2_imm;
+                m3      = `MUX3_result;
+                m4      = `MUX4_PCadd4;
+                m5      = `MUX5_pc;
+                m6      = `MUX6_PCadd4;
+                aluc    = `ADD;
             end
             `INST_TYPE_E: begin
                 case ({fun7_31_25, rs2_24_20})
-                    `INST_EBREAK: ebreak(`HIT_TRAP, inst, `Unit_CU);
-                     default:     ebreak(`ABORT, inst, `Unit_CU);
+                    `INST_EBREAK: ebreak(`HIT_TRAP, inst, `Unit_CU10);
+                     default:     ebreak(`ABORT, inst, `Unit_CU11);
                 endcase
             end
             default: begin   //uae
-                ebreak(`ABORT, inst, `Unit_CU);
+                ebreak(`ABORT, inst, `Unit_CU12);
                 // type1 = 3'd0;
                 // m1    = `MUX1_src1;
                 // m2    = `MUX2_imm;

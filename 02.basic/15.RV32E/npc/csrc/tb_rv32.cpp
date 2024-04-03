@@ -35,6 +35,13 @@ extern void   pmem_write(int waddr, int wdata, char wmask);    // mem.v
 
 #define start_time 3
 
+static char *alu_names[16] = {
+  "Unit_ALU", "Unit_CU1", "Unit_CU2", "Unit_CU3",
+  "Unit_CU4", "Unit_CU5", "Unit_CU6", "Unit_CU7",
+  "Unit_CU8", "Unit_CU9", "Unit_CU10","Unit_CU11",
+  "Unit_CU12","Unit_IE1", "Unit_IE2", "Unit_IE3"
+};
+
 extern void ebreak(int station, int inst, char unit)
 {
   if(Verilated::gotFinish())
@@ -48,8 +55,12 @@ extern void ebreak(int station, int inst, char unit)
     npc_state.halt_ret = top->rv32__DOT__register_file_inst__DOT__regs[10]; //a0
     npc_state.halt_pc = top->rv32__DOT__pc;
 
-    assert((unit == Unit_ALU) || (unit == Unit_CU) || (unit == Unit_IE));
-    Log("Ebreak takes place in the %s", (unit == Unit_ALU) ? "ALU" : ((unit == Unit_CU) ? "CU" : "IE"));
+    assert( (unit == Unit_ALU) || (unit == Unit_CU1) || (unit == Unit_CU2) || (unit == Unit_CU3) || 
+            (unit == Unit_CU4) || (unit == Unit_CU5) || (unit == Unit_CU6) || (unit == Unit_CU7) || 
+            (unit == Unit_CU8) || (unit == Unit_CU9) || (unit == Unit_CU10)|| (unit == Unit_CU11)||
+            (unit == Unit_CU12)|| (unit == Unit_IE1) || (unit == Unit_IE2) || (unit == Unit_IE3));
+
+    Log("Ebreak takes place in the %s", alu_names[unit]);
     Log("maintime = %ld, state = %d, pc = 0x%08x, inst = 0x%08x", main_time, npc_state.state, top->rv32__DOT__pc, top->rv32__DOT__inst);
 
     switch(station)
@@ -83,8 +94,8 @@ void pmem_write(int waddr, int wdata, char wmask)
   {
     // case WByte: pmem_w(waddr, 1, wdata);
     //             break;
-    // case WHalf: pmem_w(waddr, 2, wdata);
-    //             break;
+    case WHalf: pmem_w(waddr, 2, wdata);
+                break;
     case WWord: pmem_w(waddr, 4, wdata);
                 break;
     default:    assert(0);
