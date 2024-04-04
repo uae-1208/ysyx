@@ -15,7 +15,7 @@ module RISB_type(
             `INST_R: imm_12 = 12'b0000_0000_0000;
             `INST_I: imm_12 = {funct7, rs2};
             `INST_S: imm_12 = {funct7, rd};
-            `INST_B: imm_12 = {funct7[6], rd[0], funct7[5:0], rd[4:1]} << 1;
+            `INST_B: imm_12 = {funct7[6], rd[0], funct7[5:0], rd[4:1]};
             `INST_U,
             `INST_J: imm_12 = 12'b0000_0000_0000;
             default: begin
@@ -43,8 +43,8 @@ module UJ_type(
             `INST_I,
             `INST_S,
             `INST_B: imm_20 = 20'b0000_0000_0000_0000_0000;
-            `INST_U: imm_20 = {funct7, rs2, rs1, funct3} << 12;
-            `INST_J: imm_20 = {funct7[6], rs1, funct3, rs2[0], funct7[5:0], rs2[4:1]} << 1;
+            `INST_U: imm_20 = {funct7, rs2, rs1, funct3};
+            `INST_J: imm_20 = {funct7[6], rs1, funct3, rs2[0], funct7[5:0], rs2[4:1]};
             default: begin
                         imm_20 = 0;
                         ebreak(`ABORT, 32'hdeafbeaf, `Unit_IE2);
@@ -114,8 +114,10 @@ module imm_extend(
 
     always @(*) begin
         case (type3)
-            `INST_R, `INST_I, `INST_S, `INST_B:  imm32 = imm_12_to_32;
-            `INST_U, `INST_J:                    imm32 = imm_20_to_32;
+            `INST_R, `INST_I, `INST_S: imm32 = imm_12_to_32;
+            `INST_B:                   imm32 = imm_12_to_32 << 1;
+            `INST_U:                   imm32 = imm_20_to_32 << 12;
+            `INST_J:                   imm32 = imm_20_to_32 << 1;
             default: begin
                         imm32 = 0;
                         ebreak(`ABORT, 32'hdeafbeaf, `Unit_IE3);

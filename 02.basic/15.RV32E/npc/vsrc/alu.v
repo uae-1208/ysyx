@@ -12,17 +12,26 @@ module alu(
     wire [`RegBus] temp = {{(`BitWidth - 1){1'b1}}, 1'b0};  //for example, BitWidth = 32，then temp = 0xfffe
     // wire [`RegBus] num1_cplm = ~num1 + `RegNum'h1;    //complement code
     wire [`RegBus] num2_cplm = ~num2 + `RegNum'h1;    //complement code
+    wire [`RegBus] num2_temp = (num2 & 32'h1f);    
 
     always @(*) begin
         case (aluc)
             `ADD:      result = num1 + num2;
             `SUB:      result = num1 + num2_cplm;
+            `SLL:      result = num1 << num2;
             `SLTU:     result = {{(`BitWidth - 1){1'b0}}, (num1 < num2)};
             `XOR:      result = num1 ^ num2;
-            `SRA:      result = num1 >>> (num2 & 32'h1f);
+            `SRL:      result = num1 >>  (num2 & 32'h1f);
+            `SRA:      result = ($signed(num1)) >>> (num2 & 32'h1f);
             `OR:       result = num1 | num2;
+            `AND:      result = num1 & num2;
             `BEQ:      result = {{(`BitWidth - 1){1'b0}}, (num1 == num2)};
             `BNE:      result = {{(`BitWidth - 1){1'b0}}, (num1 != num2)};
+            `BLT:      result = {{(`BitWidth - 1){1'b0}}, (($signed(num1)) <  ($signed(num2)))};
+            `BGE:      result = {{(`BitWidth - 1){1'b0}}, (($signed(num1)) >= ($signed(num2)))};
+            `BLTU:     result = {{(`BitWidth - 1){1'b0}}, (num1 <  num2)};
+            `BGEU:     result = {{(`BitWidth - 1){1'b0}}, (num1 >= num2)};
+            `ADD_LUI:  result = 0 + num2;
             `ADD_JALR: result = (num1 + num2) & temp;
             default:   begin
                         ebreak(`ABORT, 32'hdeafbeaf, `Unit_ALU);

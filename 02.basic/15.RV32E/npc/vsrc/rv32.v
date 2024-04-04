@@ -123,6 +123,7 @@ module rv32(
   wire            wen_reg;    //RegFile write enable
   wire            wen_mem;    //mem write enable
   wire[7:0]       wmask;      //mem write mask
+  wire[2:0]       rmask;      //mem read  mask
   wire            m1;         //mux1 sel
   wire            m2;         //mux2 sel
   wire            m3;         //mux3 sel
@@ -182,6 +183,7 @@ module rv32(
     .wmask  (wmask),
     .waddr  (result),
     .wdata  (src2),
+    .rmask  (rmask & {3{clk1_flag}}),
     .raddr  (raddr),
     .rdata  (mem_rdata)
   );
@@ -199,6 +201,7 @@ module rv32(
     .wen_reg   (wen_reg),    
     .wen_mem   (wen_mem),
     .wmask     (wmask),
+    .rmask     (rmask),
     .m1        (m1),    
     .m2        (m2),    
     .m3        (m3),   

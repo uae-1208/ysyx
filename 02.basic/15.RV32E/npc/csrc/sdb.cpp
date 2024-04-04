@@ -203,10 +203,16 @@ static char* rl_gets()
     return line_read;
 }
 
+void sdb_set_batch_mode(void) 
+{
+  is_batch_mode = true;
+}
+
 
 void sdb_mainloop() 
 {
-    if(is_batch_mode) {
+    if(is_batch_mode) 
+    {
         cmd_c(NULL);
         return;
     }
