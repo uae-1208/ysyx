@@ -5,6 +5,7 @@
 
 /********extern functions or variables********/
 extern Vrv32 *top;
+extern vluint64_t main_time;
 /*********************************************/
 
 
@@ -61,8 +62,8 @@ static inline bool in_pmem(paddr_t addr) {
 }
 
 static inline void out_of_bound(paddr_t addr) {
-  panic("address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x", 
-         addr, PMEM_LEFT, PMEM_RIGHT, top->rv32__DOT__pc);
+  panic("address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld", 
+         addr, PMEM_LEFT, PMEM_RIGHT, top->rv32__DOT__pc, main_time);
 }
 
 word_t pmem_r(paddr_t addr, int len) 

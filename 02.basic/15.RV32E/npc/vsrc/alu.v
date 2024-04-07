@@ -19,19 +19,18 @@ module alu(
             `ADD:      result = num1 + num2;
             `SUB:      result = num1 + num2_cplm;
             `SLL:      result = num1 << num2;
-            `SLTU:     result = {{(`BitWidth - 1){1'b0}}, (num1 < num2)};
             `XOR:      result = num1 ^ num2;
-            `SRL:      result = num1 >>  (num2 & 32'h1f);
+            `SRL:      result = num1 >> (num2 & 32'h1f);
             `SRA:      result = ($signed(num1)) >>> (num2 & 32'h1f);
             `OR:       result = num1 | num2;
             `AND:      result = num1 & num2;
-            `BEQ:      result = {{(`BitWidth - 1){1'b0}}, (num1 == num2)};
-            `BNE:      result = {{(`BitWidth - 1){1'b0}}, (num1 != num2)};
-            `BLT:      result = {{(`BitWidth - 1){1'b0}}, (($signed(num1)) <  ($signed(num2)))};
-            `BGE:      result = {{(`BitWidth - 1){1'b0}}, (($signed(num1)) >= ($signed(num2)))};
-            `BLTU:     result = {{(`BitWidth - 1){1'b0}}, (num1 <  num2)};
-            `BGEU:     result = {{(`BitWidth - 1){1'b0}}, (num1 >= num2)};
-            `ADD_LUI:  result = 0 + num2;
+            `EQ:       result = {{(`BitWidth - 1){1'b0}}, (num1 == num2)};
+            `NE:       result = {{(`BitWidth - 1){1'b0}}, (num1 != num2)};
+            `LT:       result = {{(`BitWidth - 1){1'b0}}, (($signed(num1)) <  ($signed(num2)))};
+            `GE:       result = {{(`BitWidth - 1){1'b0}}, (($signed(num1)) >= ($signed(num2)))};
+            `LTU:      result = {{(`BitWidth - 1){1'b0}}, (num1 <  num2)};
+            `GEU:      result = {{(`BitWidth - 1){1'b0}}, (num1 >= num2)};
+            `ADD_LUI:  result = num2;
             `ADD_JALR: result = (num1 + num2) & temp;
             default:   begin
                         ebreak(`ABORT, 32'hdeafbeaf, `Unit_ALU);

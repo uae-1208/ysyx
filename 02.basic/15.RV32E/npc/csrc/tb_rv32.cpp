@@ -30,6 +30,7 @@ extern word_t pmem_r(paddr_t addr, int len);
 extern void   pmem_w(paddr_t addr, int len, word_t data);
 extern void   ebreak(int station, int inst);                   // control_unit.v
 extern int    pmem_read(int raddr);                            // mem.v
+extern int    pmem_read_inst(int pc);
 extern void   pmem_write(int waddr, int wdata, char wmask);    // mem.v
 /*********************************************/
 
@@ -82,15 +83,26 @@ extern void ebreak(int station, int inst, char unit)
 
 extern int pmem_read(int raddr)
 {
-  if(main_time >= start_time) 
+  static int data = 0xdeadbeaf;
+  if(top->clk == 0)
+    return data;
+
+  if(main_time >= start_time)
+  {
+    data = pmem_r(raddr, 4);
+    return data; 
     // return pmem_r((raddr & ~0x3u), 4);
-    return pmem_r(raddr, 4);
+  } 
   else
     return 0xdeadbeaf;
 }
 
+
 void pmem_write(int waddr, int wdata, char wmask)
 {
+  if(top->clk == 0)
+    return;
+
   switch (wmask)
   {
     case WByte: pmem_w(waddr, 1, wdata);
@@ -111,8 +123,6 @@ void single_cycle(void)
   { 
     top->clk = 0; top->eval(); tfp->dump(main_time);  main_time++; //推动仿真时间
     top->clk = 1; top->eval(); tfp->dump(main_time);  main_time++; //推动仿真时间
-    // if(main_time >= start_time)   // at the begining (main_time < start_time and before the reset), all regs are zeros
-    //   top->inst = inst_fetch(top->rv32__DOT__pc, 4);
   }
 }
 
@@ -121,8 +131,6 @@ static void reset(void)
   top->rst = 0; single_cycle();
   top->rst = 1; single_cycle();
   top->rst = 0; 
-  // single_cycle();
-  // single_cycle(); 
 }
 
 static void init_verilator(void)

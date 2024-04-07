@@ -7,18 +7,18 @@ module control_unit(
     output wire [4:0]       rs2_24_20,
     output wire [2:0]       fun3_14_12,
     output wire [6:0]       fun7_31_25,
-    output reg  [`TYPE_BUS] type1,      //inst type
+    output reg  [`TYPE_BUS] IType,      //inst type
     output reg  [`AlucBus]  aluc,       //alu operation typp
-    output reg              wen_reg,    //RegFile write enable
-    output reg              wen_mem,    //mem write enable
+    output reg              reg_wen,    //RegFile write enable
+    output reg              mem_wen,    //mem write enable
+    output reg              mem_ren,    //mem read  enable
     output reg  [7:0]       wmask,      //mem write mask
     output reg  [2:0]       rmask,      //mem read  mask
     output reg              m1,         //mux1 sel
     output reg              m2,         //mux2 sel
     output reg              m3,         //mux3 sel
-    output reg  [1:0]       m4,         //mux4 sel
-    output reg              m5,         //mux5 sel
-    output reg              m6          //mux6 sel
+    output reg              m4,         //mux4 sel
+    output reg  [1:0]       m5          //mux5 sel
 );
 
     import "DPI-C" function void ebreak(input int station, input int inst, input byte unit);
@@ -33,22 +33,22 @@ module control_unit(
     always @(*) begin
         case(opcode_6_0)
             `INST_TYPE_R: begin
-                type1   = `INST_R;   
-                wen_reg = `WEnable;   
-                wen_mem = `WDisen;   
-                wmask   = `WWord;   
-                rmask   = `LoadW;   
-                m1      = `MUX1_src1;
-                m2      = `MUX2_src2;
-                m3      = `MUX3_PCadd4;
-                m4      = `MUX4_result;
-                m5      = `MUX5_pc;
-                m6      = `MUX6_PCadd4;
+                IType   = `INST_R;   
+                reg_wen = `WEnable;   
+                mem_wen = `WDisen;   
+                mem_ren = `WDisen;   
+                wmask   = `WWord;          // don't care      
+                rmask   = `LoadW;          // don't care      
+                m1      = `MUX1_NBpc;
+                m2      = `MUX2_PCadd4;
+                m3      = `MUX3_src2;
+                m4      = `MUX4_src1;
+                m5      = `MUX5_result;
                 if(fun7_31_25 == 7'b000_0000) begin
                     case (fun3_14_12)
                         `INST_ADD:  aluc = `ADD;
                         `INST_SLL:  aluc = `SLL;
-                        `INST_SLTU: aluc = `SLTU;
+                        `INST_SLTU: aluc = `LTU;
                         `INST_XOR:  aluc = `XOR;
                         `INST_SRL:  aluc = `SRL;
                         `INST_OR:   aluc = `OR;
@@ -66,20 +66,20 @@ module control_unit(
                 end
             end
             `INST_TYPE_I: begin
-                type1   = `INST_I;   
-                wen_reg = `WEnable;   
-                wen_mem = `WDisen;   
-                wmask   = `WWord;   
-                rmask   = `LoadW;   
-                m1      = `MUX1_src1;
-                m2      = `MUX2_imm;
-                m3      = `MUX3_PCadd4;
-                m4      = `MUX4_result;
-                m5      = `MUX5_pc;
-                m6      = `MUX6_PCadd4;
+                IType   = `INST_I;   
+                reg_wen = `WEnable;   
+                mem_wen = `WDisen;   
+                mem_ren = `WDisen;   
+                wmask   = `WWord;          // don't care      
+                rmask   = `LoadW;          // don't care      
+                m1      = `MUX1_NBpc;
+                m2      = `MUX2_PCadd4;
+                m3      = `MUX3_imm32;
+                m4      = `MUX4_src1;
+                m5      = `MUX5_result;
                 case (fun3_14_12)
                     `INST_ADDI:  aluc = `ADD;
-                    `INST_SLTIU: aluc = `SLTU;
+                    `INST_SLTIU: aluc = `LTU;
                     `INST_XORI:  aluc = `XOR;
                     `INST_ANDI:  aluc = `AND;
                     `INST_SLLI:  aluc = `SLL;
@@ -94,17 +94,17 @@ module control_unit(
                 endcase
             end          
             `INST_TYPE_L: begin
-                type1   = `INST_I; 
+                IType   = `INST_I; 
                 aluc    = `ADD;  
-                wen_reg = `WEnable;   
-                wen_mem = `WDisen;   
-                wmask   = `WWord;   
-                m1      = `MUX1_src1;
-                m2      = `MUX2_imm;
-                m3      = `MUX3_PCadd4;
-                m4      = `MUX4_memdat;
-                m5      = `MUX5_result;
-                m6      = `MUX6_PCadd4;
+                reg_wen = `WEnable;   
+                mem_wen = `WDisen;   
+                mem_ren = `WEnable;   
+                wmask   = `WWord;          // don't care      
+                m1      = `MUX1_NBpc;
+                m2      = `MUX2_PCadd4;
+                m3      = `MUX3_imm32;
+                m4      = `MUX4_src1;
+                m5      = `MUX5_memdat;
                 case (fun3_14_12)
                     `INST_LH:  rmask = `LoadH;
                     `INST_LW:  rmask = `LoadW;
@@ -114,17 +114,17 @@ module control_unit(
                 endcase
             end
             `INST_TYPE_S: begin
-                type1   = `INST_S;   
+                IType   = `INST_S;   
                 aluc    = `ADD;
-                wen_reg = `WDisen;   
-                wen_mem = `WEnable;   
-                rmask   = `LoadW;   
-                m1      = `MUX1_src1;
-                m2      = `MUX2_imm;
-                m3      = `MUX3_PCadd4;
-                m4      = `MUX4_result;
-                m5      = `MUX5_pc;
-                m6      = `MUX6_PCadd4;
+                reg_wen = `WDisen;   
+                mem_wen = `WEnable;   
+                mem_ren = `WDisen;   
+                rmask   = `LoadW;          // don't care      
+                m1      = `MUX1_NBpc;
+                m2      = `MUX2_PCadd4;
+                m3      = `MUX3_imm32;
+                m4      = `MUX4_src1;
+                m5      = `MUX5_memdat;
                 case (fun3_14_12)
                     `INST_SB: wmask = `WByte;
                     `INST_SH: wmask = `WHalf;
@@ -133,82 +133,82 @@ module control_unit(
                 endcase
             end
             `INST_TYPE_B: begin
-                type1   = `INST_B;   
-                wen_reg = `WDisen;   
-                wen_mem = `WDisen;   
-                wmask   = `WWord;   
-                rmask   = `LoadW;   
-                m1      = `MUX1_src1;
-                m2      = `MUX2_src2;
-                m3      = `MUX3_PCadd4;
-                m4      = `MUX4_result;
-                m5      = `MUX5_pc;
-                m6      = `MUX6_bump;
+                IType   = `INST_B;   
+                reg_wen = `WDisen;   
+                mem_wen = `WDisen;   
+                mem_ren = `WDisen;   
+                wmask   = `WWord;            // don't care 
+                rmask   = `LoadW;            // don't care  
+                m1      = `MUX1_Bpc;
+                m2      = `MUX2_PCadd4;      // don't care
+                m3      = `MUX3_src2;
+                m4      = `MUX4_src1;
+                m5      = `MUX5_result;      // don't care
                 case (fun3_14_12)
-                    `INST_BEQ:  aluc = `BEQ;
-                    `INST_BNE:  aluc = `BNE;
-                    `INST_BLT:  aluc = `BLT;
-                    `INST_BGE:  aluc = `BGE;
-                    `INST_BLTU: aluc = `BLTU;
-                    `INST_BGEU: aluc = `BGEU;
+                    `INST_BEQ:  aluc = `EQ;
+                    `INST_BNE:  aluc = `NE;
+                    `INST_BLT:  aluc = `LT;
+                    `INST_BGE:  aluc = `GE;
+                    `INST_BLTU: aluc = `LTU;
+                    `INST_BGEU: aluc = `GEU;
                     default:   ebreak(`ABORT, inst, `Unit_CU8);  //uae
                 endcase
             end
             `INST_TYPE_LUI: begin
-                type1   = `INST_U;   
-                wen_reg = `WEnable;   
-                wen_mem = `WDisen;   
-                wmask   = `WWord;   
-                rmask   = `LoadW;   
-                m1      = `MUX1_pc;
-                m2      = `MUX2_imm;
-                m3      = `MUX3_PCadd4;
-                m4      = `MUX4_result;
-                m5      = `MUX5_pc;
-                m6      = `MUX6_PCadd4;
+                IType   = `INST_U;   
                 aluc    = `ADD_LUI;
+                reg_wen = `WEnable;   
+                mem_wen = `WDisen;   
+                mem_ren = `WDisen;   
+                wmask   = `WWord;          // don't care   
+                rmask   = `LoadW;          // don't care   
+                m1      = `MUX1_NBpc;
+                m2      = `MUX2_PCadd4;
+                m3      = `MUX3_imm32;
+                m4      = `MUX4_src1;      // don't care   
+                m5      = `MUX5_result;
             end
             `INST_TYPE_AUIPC: begin
-                type1   = `INST_U;   
-                wen_reg = `WEnable;   
-                wen_mem = `WDisen;   
-                wmask   = `WWord;   
-                rmask   = `LoadW;   
-                m1      = `MUX1_pc;
-                m2      = `MUX2_imm;
-                m3      = `MUX3_PCadd4;
-                m4      = `MUX4_result;
-                m5      = `MUX5_pc;
-                m6      = `MUX6_PCadd4;
+                IType   = `INST_U;   
                 aluc    = `ADD;
+                reg_wen = `WEnable;   
+                mem_wen = `WDisen;   
+                mem_ren = `WDisen;   
+                wmask   = `WWord;          // don't care      
+                rmask   = `LoadW;          // don't care      
+                m1      = `MUX1_NBpc;
+                m2      = `MUX2_PCadd4;
+                m3      = `MUX3_imm32;
+                m4      = `MUX4_pc;
+                m5      = `MUX5_result;
             end
             `INST_TYPE_JALR: begin
-                type1   = `INST_I;   
-                wen_reg = `WEnable;   
-                wen_mem = `WDisen;   
-                wmask   = `WWord;   
-                rmask   = `LoadW;   
-                m1      = `MUX1_src1;
-                m2      = `MUX2_imm;
-                m3      = `MUX3_result;
-                m4      = `MUX4_PCadd4;
-                m5      = `MUX5_pc;
-                m6      = `MUX6_PCadd4;
+                IType   = `INST_I;   
                 aluc    = `ADD_JALR;
+                reg_wen = `WEnable;   
+                mem_wen = `WDisen;   
+                mem_ren = `WDisen;   
+                wmask   = `WWord;          // don't care      
+                rmask   = `LoadW;          // don't care      
+                m1      = `MUX1_NBpc;
+                m2      = `MUX2_result;
+                m3      = `MUX3_imm32;
+                m4      = `MUX4_src1;
+                m5      = `MUX5_PCadd4;
             end            
             `INST_TYPE_JAL: begin
-                type1   = `INST_J;   
-                wen_reg = `WEnable;   
-                wen_mem = `WDisen;   
-                wmask   = `WWord;   
-                rmask   = `LoadW;   
-                m1      = `MUX1_pc;
-                m2      = `MUX2_imm;
-                m3      = `MUX3_result;
-                m4      = `MUX4_PCadd4;
-                m5      = `MUX5_pc;
-                m6      = `MUX6_PCadd4;
+                IType   = `INST_J;   
                 aluc    = `ADD;
+                reg_wen = `WEnable;   
+                mem_wen = `WDisen;   
+                mem_ren = `WDisen;   
+                wmask   = `WWord;          // don't care      
+                rmask   = `LoadW;          // don't care      
+                m1      = `MUX1_NBpc;
+                m2      = `MUX2_result;
+                m3      = `MUX3_imm32;
+                m4      = `MUX4_pc;
+                m5      = `MUX5_PCadd4;
             end
             `INST_TYPE_E: begin
                 case ({fun7_31_25, rs2_24_20})
@@ -216,14 +216,7 @@ module control_unit(
                      default:     ebreak(`ABORT, inst, `Unit_CU10);
                 endcase
             end
-            default: begin   //uae
-                ebreak(`ABORT, inst, `Unit_CU11);
-                // type1 = 3'd0;
-                // m1    = `MUX1_src1;
-                // m2    = `MUX2_imm;
-                // m3    = `MUX3_PCadd4;
-                // aluc  = `ADD;
-            end
+            default: ebreak(`ABORT, inst, `Unit_CU11);   //uae
         endcase
     end
 

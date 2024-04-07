@@ -96,55 +96,47 @@
 
 
 // MUX1
-`define MUX1_pc   1'b0
-`define MUX1_src1 1'b1
+`define MUX1_NBpc  1'b0   //not bump inst
+`define MUX1_Bpc   1'b1   //is bump inst
 
 
 // MUX2
-`define MUX2_src2 1'b0
-`define MUX2_imm  1'b1
-
+`define MUX2_PCadd4  1'b0
+`define MUX2_result  1'b1
 
 // MUX3
-`define MUX3_PCadd4 1'b0
-`define MUX3_result 1'b1
-
+`define MUX3_src2  1'b0
+`define MUX3_imm32 1'b1
 
 // MUX4
-`define MUX4_PCadd4 2'd0
-`define MUX4_result 2'd1
-`define MUX4_memdat 2'd2
-`define MUX4_IDLE   2'd3
-
+`define MUX4_pc    1'b0
+`define MUX4_src1  1'b1
 
 // MUX5
-`define MUX5_pc     1'b0
-`define MUX5_result 1'b1
+`define MUX5_PCadd4 2'd0
+`define MUX5_memdat 2'd1
+`define MUX5_result 2'd2
+`define MUX5_IDLE   2'd3
 
-
-// MUX5
-`define MUX6_PCadd4 1'b0
-`define MUX6_bump   1'b1
 
 
 // ALU
-`define ADD       5'b00001
-`define SUB       5'b00010
-`define SLL       5'b00011
-`define SLTU      5'b00100     //sltiu, sltu
-`define XOR       5'b00101
-`define SRL       5'b00110
-`define SRA       5'b00111
-`define OR        5'b01000
-`define AND       5'b01001
-`define BEQ       5'b01010
-`define BNE       5'b01011
-`define BLT       5'b01100
-`define BGE       5'b01101
-`define BLTU      5'b01110
-`define BGEU      5'b01111
-`define ADD_LUI   5'b10000
-`define ADD_JALR  5'b10001
+`define ADD       5'b00000
+`define SUB       5'b00001
+`define SLL       5'b00010
+`define XOR       5'b00011
+`define SRL       5'b00100
+`define SRA       5'b00101
+`define OR        5'b00110
+`define AND       5'b00111
+`define EQ        5'b01000
+`define NE        5'b01001
+`define LT        5'b01010
+`define GE        5'b01011
+`define LTU       5'b01100
+`define GEU       5'b01101
+`define ADD_LUI   5'b01110
+`define ADD_JALR  5'b01111
 `define AlucBus   4:0
 
 
