@@ -27,4 +27,7 @@
 - **2024/4/3** ：为`npc`添加了`sltiu, beq, bne, sltu, xor,or,sh,srai`等8条指令。  
 - **2024/4/4** ：为`npc`添加了`lbu, andi, sll, and, xori, sb, bge, blt, lui, srli, bgeu, slli, bltu, lh, lhu, sra, srl`等17条指令。  
 - **2024/4/5** ：将`npc`从**三周期**改成了**单周期**，频率提升了3倍。    `verilator`太多坑了，`inst_data`会莫名其妙被`rdata_temp = pmem_read(raddr);`修改。
+- **2024/4/7** ：看`IO`的源代码。
+- **2024/4/8** ：完成了`IO`的串口部分。
+
 
