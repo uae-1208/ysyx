@@ -74,7 +74,7 @@ __am_asm_trap:
   sw	 a0, 0(sp)
   csrr a0, mepc
   addi a0, a0, 4
-  jalr x0, a0, 0
+  csrw mepc, a0
   lw	 a0, 0(sp)
 
   addi sp, sp, 4
