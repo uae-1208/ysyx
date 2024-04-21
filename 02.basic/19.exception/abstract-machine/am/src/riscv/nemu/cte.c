@@ -8,7 +8,9 @@ Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
-      case 0xb: ev.event = EVENT_YIELD; break;
+      case 0xb: ev.event = EVENT_YIELD; 
+                c->mepc = c->mepc + 4;
+                break;
       default : ev.event = EVENT_ERROR; break;
     }
 
@@ -33,7 +35,19 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
 }
 
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
-  return NULL;
+  //栈底在上，栈顶在下
+  Context *c = kstack.end - 4 - sizeof(Context);
+  
+  c->mcause = 0xb;
+  c->mstatus = 0x1800;
+  //入口为f()
+  c->mepc = (uint32_t)entry;
+  for(int i = 0; i < 32; i++)
+    c->gpr[i] = 0;
+  
+  //观察汇编，a0为传参寄存器
+  c->gpr[10] = (uint32_t)arg;
+  return c;
 }
 
 void yield() {

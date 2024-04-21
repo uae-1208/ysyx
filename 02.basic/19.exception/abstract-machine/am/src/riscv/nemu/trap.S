@@ -60,6 +60,9 @@ __am_asm_trap:
   mv a0, sp
   jal __am_irq_handle
 
+  //观察schedule的汇编代码可以发现，current->cp放在了a0当中
+  mv sp, a0
+
   LOAD t1, OFFSET_STATUS(sp)
   LOAD t2, OFFSET_EPC(sp)
   csrw mstatus, t1
@@ -70,13 +73,13 @@ __am_asm_trap:
   addi sp, sp, CONTEXT_SIZE
 
   // mret: software +4      or modify the simple_trap
-  addi sp, sp, -4
-  sw	 a0, 0(sp)
-  csrr a0, mepc
-  addi a0, a0, 4
-  csrw mepc, a0
-  lw	 a0, 0(sp)
+  // addi sp, sp, -4
+  // sw	 a0, 0(sp)
+  // csrr a0, mepc
+  // addi a0, a0, 4    // pc(--> 'ecall') + 4
+  // csrw mepc, a0 
+  // lw	 a0, 0(sp)
+  // addi sp, sp, 4
 
-  addi sp, sp, 4
   mret
 
