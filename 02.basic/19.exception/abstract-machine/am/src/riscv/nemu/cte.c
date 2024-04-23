@@ -42,7 +42,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   c->mstatus = 0x1800;
   //入口为f()
   c->mepc = (uint32_t)entry;
-  for(int i = 0; i < 32; i++)
+  for(int i = 0; i < NR_REGS; i++)
     c->gpr[i] = 0;
   
   //观察汇编，a0为传参寄存器

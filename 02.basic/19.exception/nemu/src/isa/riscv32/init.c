@@ -19,8 +19,25 @@
 // this is not consistent with uint8_t
 // but it is ok since we do not access the array directly
 static const uint32_t img [] = {
-  0xfc046513,
   0xd5600593,  // li	a1-682
+  0x00500613,  // li	a2,5
+  0x02c5c6b3,  // div	a3,a1,a2
+  0x02c5d733,  // divu	a4,a1,a2
+  0x00000297,  // auipc t0,0
+  0x00028823,  // sb  zero,16(t0)
+  0x0102c503,  // lbu a0,16(t0)
+  0x00100073,  // ebreak (used as nemu_trap)
+  0x06400593,    //li	  a1,100
+  0x06458613,    //addi	a2,a1,100
+  0x0c860693,    //addi	a3,a2,200
+  0xed468713,    //addi	a4,a3,-300
+  0x30571073,    //csrw	mtvec,a4
+  0xe7070793,    //addi	a5,a4,-400
+  0x80178813,    //addi	a6,a5,-2047
+  0x7fa80893,    //addi	a7,a6,2042
+  0x7fa88893,    //addi	a7,a7,2042
+  0x00100073,    //ebreak
+    0xd5600593,  // li	a1-682
   0x00500613,  // li	a2,5
   0x02c5c6b3,  // div	a3,a1,a2
   0x02c5d733,  // divu	a4,a1,a2

@@ -18,6 +18,8 @@
 #include "../local-include/reg.h"
 #include <utils.h>
 
+#define NR_REGS MUXDEF(CONFIG_RVE, 16, 32)
+
 const char *ref_regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
   "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
@@ -35,7 +37,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   }
 
   //check general purpose registers
-  for(int i = 0; i < 32; i++)
+  for(int i = 0; i < NR_REGS; i++)
     if(cpu.gpr[i] != ref_r->gpr[i])
     {
       _Log(ANSI_FG_YELLOW "[difftest]" ANSI_NONE   ANSI_FG_RED "%s" 

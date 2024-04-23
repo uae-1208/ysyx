@@ -17,6 +17,8 @@
 #include "local-include/reg.h"
 #include "utils.h"
 
+#define NR_REGS MUXDEF(CONFIG_RVE, 16, 32)
+
 const char *regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
   "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
@@ -28,7 +30,7 @@ void isa_reg_display()
 {
   _Log(ANSI_FG_RED "RegName  Hex_Value       Dec_Value\n" ANSI_NONE);
   _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\n", "pc", cpu.pc, cpu.pc);
-  for(int i = 0; i < 32; i++)
+  for(int i = 0; i < NR_REGS; i++)
   {
     _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, regs[i]);
     _Log("0x%08x\t %010u\n", cpu.gpr[i], cpu.gpr[i]);
@@ -53,8 +55,8 @@ void isa_single_reg_display(char *reg_name)
     return;
   }      
 
-  //gpr
-  for(i = 1; i < 32; i++)
+  //other gprs
+  for(i = 1; i < NR_REGS; i++)
     if(strcmp(reg_name, regs[i]) == 0)
     {
       _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\t   %010d\n", regs[i], cpu.gpr[i], cpu.gpr[i], cpu.gpr[i]);
@@ -105,7 +107,7 @@ word_t isa_reg_str2val(const char *s, bool *success)
       return cpu.gpr[0];
       
   //others
-  for(i = 1; i < 32; i++)
+  for(i = 1; i < NR_REGS; i++)
     if(strcmp(s, regs[i]) == 0)
       return cpu.gpr[i];
 

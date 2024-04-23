@@ -134,7 +134,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , Z, s->dnpc = cpu.csr[MEPC]); 
 
 
-  // if is riscve, R(17) -> R(15)
+  // if is riscve, R(17) -> R(15)     //uae
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , N, cpu.csr[MCAUSE] = R(17), s->dnpc = isa_raise_intr(0, s->pc)); 
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
