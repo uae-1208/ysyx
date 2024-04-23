@@ -67,5 +67,4 @@ module csr_regs(
         endcase
     end
 
-
 endmodule
