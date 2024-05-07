@@ -40,3 +40,4 @@ module ifu(
     assign o_post_valid = ~i_cycle_end;
 
 endmodule
+

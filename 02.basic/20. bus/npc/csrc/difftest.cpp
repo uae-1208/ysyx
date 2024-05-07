@@ -14,15 +14,14 @@ extern uint8_t* guest_to_host(paddr_t paddr);
 #define top_gprs top->rv32__DOT__register_file_inst__DOT__regs
 
 CPU_state cpu;
-static int skip_cnt_ref = 0;   // the amount to skip the ref
-static bool skip_flag = false; // the flag   to skip the ref 
+static bool skip_flag = false; // the flag to skip the ref 
 
 void (*ref_difftest_memcpy)(paddr_t addr, void *buf, size_t n, bool direction) = NULL;
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
 void (*ref_difftest_exec)(uint64_t n) = NULL;
 
 void difftest_skip_ref() {
-  skip_cnt_ref++;
+  skip_flag = true;
 }
 
 const char *ref_regs[] = {
@@ -43,10 +42,10 @@ static void update_cpu_state(CPU_state *cpu)
     // 0x305 -> 1.mtvec;
     // 0x341 -> 2.mepc;
     // 0x342 -> 3.mcause;
-    // cpu->csr[0] = top->rv32__DOT__csr_regs_inst__DOT__mstatus;
-    // cpu->csr[1] = top->rv32__DOT__csr_regs_inst__DOT__mtvec;
-    // cpu->csr[2] = top->rv32__DOT__csr_regs_inst__DOT__mepc;
-    // cpu->csr[3] = top->rv32__DOT__csr_regs_inst__DOT__mcause;
+    cpu->csr[0] = top->rv32__DOT__csr_ctrl_inst__DOT__mstatus;
+    cpu->csr[1] = top->rv32__DOT__csr_ctrl_inst__DOT__mtvec;
+    cpu->csr[2] = top->rv32__DOT__csr_ctrl_inst__DOT__mepc;
+    cpu->csr[3] = top->rv32__DOT__csr_ctrl_inst__DOT__mcause;
 }
 
 
@@ -123,23 +122,12 @@ void difftest_step(vaddr_t pc, vaddr_t npc)
     CPU_state ref_r;
     update_cpu_state(&cpu);
 
-    // 观察波形图发现，由于testbench复位操作的代码编写以及寄存器结果要在下一个周期才写入reg_file，
-    // NPCState的更新和difftest的check必须要延迟一个周期才是正确的；
-    // 所以REF的SKIP也要延迟一个周期
-    // 这里的思路是若上一个周期的skip_cnt_ref一直不为0，则这一个周期的skip_flag始终为为true，那么执行skip操作。
-    if(skip_cnt_ref) 
+    if(skip_flag == true)
     {
-        if(skip_flag == false)
-            skip_flag = true;
-        else
-        {
-            // to skip the checking of an instruction, just copy the reg state to reference design
-            ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
-            skip_cnt_ref--;      assert(skip_cnt_ref >= 0);
-            if(skip_cnt_ref == 0)
-                skip_flag = false;
-            return;
-        }
+        // to skip the checking of an instruction, just copy the reg state to reference design
+        ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+        skip_flag = false;
+        return;
     }
 
     ref_difftest_exec(1);

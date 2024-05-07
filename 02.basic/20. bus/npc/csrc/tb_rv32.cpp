@@ -39,10 +39,11 @@ extern void difftest_skip_ref();
 /*********************************************/
 
 static uint32_t rtc_port_base[2] = {0, 0};
-static const char *unit_names[9] = {
+static const char *unit_names[14] = {
   "Unit_IDU1", "Unit_IDU2", "Unit_IDU3", "Unit_IDU4",
-  "Unit_IDU5", "Unit_IDU6", "Unit_EXU1", "Unit_LSU1",
-  "Unit_LSU2"
+  "Unit_IDU5", "Unit_IDU6", "Unit_IDU7", "Unit_IDU8", 
+  "Unit_IDU9", "Unit_EXU1", "Unit_LSU1", "Unit_LSU2",
+  "Unit_CC1 ", "Unit_CC2"
 };
 
 #define start_time 3
@@ -58,8 +59,9 @@ extern void TRAP(int station, char unit)
     npc_state.halt_pc = top->rv32__DOT__bru_inst__DOT__npc_reg;
 
     assert( (unit == Unit_IDU1) || (unit == Unit_IDU2) || (unit == Unit_IDU3) || (unit == Unit_IDU4) || 
-            (unit == Unit_IDU5) || (unit == Unit_IDU6) || (unit == Unit_EXU1) || (unit == Unit_LSU1) || 
-            (unit == Unit_LSU2) );
+            (unit == Unit_IDU5) || (unit == Unit_IDU6) || (unit == Unit_IDU7) || (unit == Unit_IDU8) ||
+            (unit == Unit_IDU9) || (unit == Unit_EXU1) || (unit == Unit_LSU1) || (unit == Unit_LSU2) ||
+            (unit == Unit_CC1)  || (unit == Unit_CC2));
 
     Log("TRAP takes place in the %s", unit_names[unit]);
     Log("maintime = %ld, state = %d, pc = 0x%08x, inst = 0x%08x", main_time, npc_state.state, 
@@ -98,7 +100,8 @@ extern int dmem_read(int raddr)
 {
   static int data = 0xdead000a;
 
-  if(main_time < start_time)
+  // 因为是是周期CPU，所以理论上来说应该轮到LSU工作的时候才读/写dmem
+  if(main_time < start_time || top->rv32__DOT__clk_cnt != 3)
     return data;
 
   // device rtc
@@ -122,7 +125,8 @@ extern int dmem_read(int raddr)
 
 void pmem_write(int waddr, int wdata, char wmask)
 {
-  if(main_time < start_time)
+  // 因为是是周期CPU，所以理论上来说应该轮到LSU工作的时候才读/写dmem
+  if(main_time < start_time || top->rv32__DOT__clk_cnt != 3)
     return;
 
   // device serial

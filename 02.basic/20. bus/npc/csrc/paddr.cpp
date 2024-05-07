@@ -17,7 +17,7 @@ static const word_t img [] = {
   0x06458613,    //addi	a2,a1,100
   0x0c860693,    //addi	a3,a2,200
   0xed468713,    //addi	a4,a3,-300
-  // 0x30571073,    //csrw	mtvec,a4
+  0x30571073,    //csrw	mtvec,a4
   0xe7070793,    //addi	a5,a4,-400
   0x80178813,    //addi	a6,a5,-2047
   0x7fa80893,    //addi	a7,a6,2042

@@ -25,9 +25,14 @@
 #define Unit_IDU4     3   
 #define Unit_IDU5     4   
 #define Unit_IDU6     5   
-#define Unit_EXU1     6   
-#define Unit_LSU1     7   
-#define Unit_LSU2     8   
+#define Unit_IDU7     6   
+#define Unit_IDU8     7   
+#define Unit_IDU9     8   
+#define Unit_EXU1     9   
+#define Unit_LSU1     10  
+#define Unit_LSU2     11  
+#define Unit_CC1      12 
+#define Unit_CC2      13
 
 // npc mem wirte mask
 #define WByte  0b00000001
@@ -50,9 +55,9 @@
 
 
 // device 
-#define CONFIG_DEVICE             1
-#define CONFIG_SERIAL_MMIO 0xa00003f8
-#define CONFIG_RTC_MMIO    0xa0000048
+#define CONFIG_DEVICE        1
+#define CONFIG_SERIAL_MMIO   0xa00003f8
+#define CONFIG_RTC_MMIO      0xa0000048
 
 
 // CSR

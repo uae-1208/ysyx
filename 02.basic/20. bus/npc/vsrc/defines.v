@@ -64,23 +64,31 @@
 
 
 // E type instruction
-`define TYPE_E   7'b111_0011
+`define TYPE_SYS      7'b111_0011
+`define INST_E_M      3'b000
 `define INST_CSRRW    3'b001
 `define INST_CSRRS    3'b010
 `define INST_MRET     12'b0011_0000_0010
 `define INST_ECALL    12'b0000_0000_0000
 `define INST_EBREAK   12'b0000_0000_0001
+
 `define HIT_TRAP      1
 `define ABORT         2
+
 `define Unit_IDU1     0  
 `define Unit_IDU2     1   
 `define Unit_IDU3     2  
 `define Unit_IDU4     3   
 `define Unit_IDU5     4   
 `define Unit_IDU6     5   
-`define Unit_EXU1     6   
-`define Unit_LSU1     7   
-`define Unit_LSU2     8   
+`define Unit_IDU7     6   
+`define Unit_IDU8     7   
+`define Unit_IDU9     8   
+`define Unit_EXU1     9   
+`define Unit_LSU1     10  
+`define Unit_LSU2     11 
+`define Unit_CC1      12 
+`define Unit_CC2      13 
 
 
 
@@ -118,14 +126,9 @@
 // RegisterFile
 `define Reg_x0     5'd0
 `define Reg0_VAL   32'd0
-`define WDisen     1'b0
-`define WEnable    1'b1
-`define Mcause_gpr 15  // riscve : a5 ; others a7
 
 
 // memory
-`define WDisen    1'b0
-`define WEnable   1'b1
 `define WByte     8'b0000_0001
 `define WHalf     8'b0000_0011
 `define WWord     8'b0000_1111
@@ -134,6 +137,16 @@
 `define LoadHU    3'd2
 `define LoadB     3'd3
 `define LoadH     3'd4
+
+
+// CSR
+`define CSR_Bus      11:0
+`define CSR_Nop      2'b00
+`define CSR_RW       2'b01
+`define CSR_RS       2'b10
+`define CSR_RC       2'b11
+`define MCASUSE_GPR  5'd15  // riscve : a5 ; others a7
+
 
 
 // ARCH
@@ -145,7 +158,8 @@
 
 
 // Logic
-`define TRUE  1'b1
-`define FALSE 1'b0
-
+`define TRUE      1'b1
+`define FALSE     1'b0
+`define Disen     1'b0
+`define Enable    1'b1
 

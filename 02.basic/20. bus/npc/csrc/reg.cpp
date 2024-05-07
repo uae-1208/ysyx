@@ -9,10 +9,10 @@ extern Vrv32 *top;
 
 
 #define top_gprs      top->rv32__DOT__register_file_inst__DOT__regs
-#define top_mstatus   top->rv32__DOT__csr_regs_inst__DOT__mstatus
-#define top_mtvec     top->rv32__DOT__csr_regs_inst__DOT__mtvec
-#define top_mepc      top->rv32__DOT__csr_regs_inst__DOT__mepc
-#define top_mcause    top->rv32__DOT__csr_regs_inst__DOT__mcause
+#define top_mstatus   top->rv32__DOT__csr_ctrl_inst__DOT__mstatus
+#define top_mtvec     top->rv32__DOT__csr_ctrl_inst__DOT__mtvec
+#define top_mepc      top->rv32__DOT__csr_ctrl_inst__DOT__mepc
+#define top_mcause    top->rv32__DOT__csr_ctrl_inst__DOT__mcause
 
 static const char *regs[] = {
     "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -63,34 +63,34 @@ void single_reg_display(char *reg_name)
             return;
         }
     
-    // // mstatus
-    // if(strcmp(reg_name, "mstatus") == 0)
-    // {
-    //     _Log(ANSI_FG_YELLOW "$%s" ANSI_NONE " 0x%08x\t %010u\t   %010d\n", "mstatus", 
-    //         top_mstatus, top_mstatus, top_mstatus);
-    //     return;
-    // }
-    // // mtvec;
-    // if(strcmp(reg_name, "mtvec") == 0)
-    // {
-    //     _Log(ANSI_FG_YELLOW "$%s  "     ANSI_NONE " 0x%08x\t %010u\t   %010d\n", "mtvec", 
-    //         top_mtvec, top_mtvec, top_mtvec);
-    //     return;
-    // }
-    // // mepc;
-    // if(strcmp(reg_name, "mepc") == 0)
-    // {
-    //     _Log(ANSI_FG_YELLOW "$%s   "      ANSI_NONE " 0x%08x\t %010u\t   %010d\n", "mepc", 
-    //         top_mepc, top_mepc, top_mepc);
-    //     return;
-    // }
-    // // mcause;
-    // if(strcmp(reg_name, "mcause") == 0)
-    // {
-    //     _Log(ANSI_FG_YELLOW "$%s " ANSI_NONE " 0x%08x\t %010u\t   %010d\n", "mcause", 
-    //         top_mcause, top_mcause, top_mcause);
-    //     return;
-    // }
+    // mstatus
+    if(strcmp(reg_name, "mstatus") == 0)
+    {
+        _Log(ANSI_FG_YELLOW "$%s" ANSI_NONE " 0x%08x\t %010u\t   %010d\n", "mstatus", 
+            top_mstatus, top_mstatus, top_mstatus);
+        return;
+    }
+    // mtvec;
+    if(strcmp(reg_name, "mtvec") == 0)
+    {
+        _Log(ANSI_FG_YELLOW "$%s  "     ANSI_NONE " 0x%08x\t %010u\t   %010d\n", "mtvec", 
+            top_mtvec, top_mtvec, top_mtvec);
+        return;
+    }
+    // mepc;
+    if(strcmp(reg_name, "mepc") == 0)
+    {
+        _Log(ANSI_FG_YELLOW "$%s   "      ANSI_NONE " 0x%08x\t %010u\t   %010d\n", "mepc", 
+            top_mepc, top_mepc, top_mepc);
+        return;
+    }
+    // mcause;
+    if(strcmp(reg_name, "mcause") == 0)
+    {
+        _Log(ANSI_FG_YELLOW "$%s " ANSI_NONE " 0x%08x\t %010u\t   %010d\n", "mcause", 
+            top_mcause, top_mcause, top_mcause);
+        return;
+    }
 
     Warn("No register %s.", reg_name);
 }

@@ -39,3 +39,4 @@ module register_file(
     // assign src1 = (is_ecall == 1'b1) ? regs[`Mcause_gpr] : src1_temp;
    
 endmodule
+

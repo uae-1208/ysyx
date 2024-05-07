@@ -1,5 +1,5 @@
 `include "/home/uae/ysyx/ysyx-workbench/npc/vsrc/defines.v"
-`define EXU_PKG_WDITH  (`CPU_Width+1+1+3+`CPU_Width+`CPU_Width+`CPU_Width+`CPU_Width+1+1+1+5+1)
+`define EXU_PKG_WDITH  (`CPU_Width+1+1+3+`CPU_Width+`CPU_Width+`CPU_Width+`CPU_Width+12+1+1+1+`CPU_Width+`CPU_Width+1+1+1+5+1)
 
 module exu(
     // system
@@ -24,16 +24,27 @@ module exu(
     input  wire [2:0]      i_exu_func3,
     input  wire [4:0]      i_exu_rd_id,
     input  wire            i_exu_gpr_wen,  
+    input  wire [1:0]      i_exu_csr_type,  
+    output wire [`CSR_Bus] i_exu_csr_rid,
+    output wire            i_exu_csr_ren,  
+    output wire            i_exu_is_mret,
+    output wire            i_exu_is_ecall,
     // from Register File
     input  wire [`RegBus]  i_exu_rs1,
     input  wire [`RegBus]  i_exu_rs2,
+    // from CSR Ctrl
+    input  wire [`RegBus]  i_exu_csr_src,
+    input  wire [`CPU_Bus] i_exu_csr_npc,
     // to LSU
-    output wire [`CPU_Bus] o_exu_alu_res,
+    output wire [`CPU_Bus] o_exu_exu_res,
     output wire            o_exu_is_load,
     output wire            o_exu_is_store,
     output wire [2:0]      o_exu_func3,
-    output wire [`CPU_Bus] o_exu_rs1,
-    output wire [`CPU_Bus] o_exu_rs2,
+    output wire [`RegBus]  o_exu_rs1,
+    output wire [`RegBus]  o_exu_rs2,
+    output wire [`CPU_Bus] o_exu_csr_npc,
+    output wire            o_exu_is_mret,
+    output wire            o_exu_is_ecall,
     // to to BRU
     output wire [`CPU_Bus] o_exu_imm,
     output wire [`CPU_Bus] o_exu_pc,
@@ -42,7 +53,10 @@ module exu(
     output wire            o_exu_brch,
     // to to WEU
     output wire [4:0]      o_exu_rd_id,
-    output wire            o_exu_gpr_wen
+    output wire            o_exu_gpr_wen,  
+    output wire [`CSR_Bus] o_exu_csr_wid,
+    output wire [`RegBus]  o_exu_csr_rd,
+    output wire            o_exu_csr_wen
 );
 
 
@@ -56,15 +70,17 @@ module exu(
     // o_pre_ready <-- ⌊_____⌋ <-- i_post_ready
 
 
-
     /************ data package ************/
     // to LSU
-    reg  [`CPU_Bus] exu_alu_res;
+    wire [`CPU_Bus] exu_exu_res  = (i_exu_csr_ren == `Enable) ? i_exu_csr_src : exu_alu_res;
     wire            exu_is_load  = i_exu_is_load;
     wire            exu_is_store = i_exu_is_store;
     wire [2:0]      exu_func3    = i_exu_func3;
     wire [`CPU_Bus] exu_rs1      = i_exu_rs1;
     wire [`CPU_Bus] exu_rs2      = i_exu_rs2;
+    wire [`CPU_Bus] exu_csr_npc  = i_exu_csr_npc; 
+    wire            exu_is_mret  = i_exu_is_mret;
+    wire            exu_is_ecall = i_exu_is_ecall;
     // to to BRU
     wire [`CPU_Bus] exu_imm      = i_exu_imm;
     wire [`CPU_Bus] exu_pc       = i_exu_pc;
@@ -74,7 +90,9 @@ module exu(
     // to to WEU
     wire [4:0]      exu_rd_id    = i_exu_rd_id;
     wire            exu_gpr_wen  = i_exu_gpr_wen;
-
+    wire [`CSR_Bus] exu_csr_wid   = i_exu_csr_rid;// 读和写同一个id
+    wire [`CPU_Bus] exu_csr_rd;
+    wire            exu_csr_wen  = i_exu_csr_ren; // 读和写同一个id
 
     MuxKey #(4, 2, `CPU_Width) mux1(num1, i_exu_num_sel, {
         `RS1_RS2, i_exu_rs1,
@@ -90,7 +108,15 @@ module exu(
         `PC_4,    `CPU_Width'd4}       
     );
 
+    MuxKey #(4, 2, `CPU_Width) mux3(exu_csr_rd, i_exu_csr_type, {
+        `CSR_Nop, `CPU_Width'd0,
+        `CSR_RW,  i_exu_rs1,
+        `CSR_RS,  i_exu_rs1 | i_exu_csr_src,
+        `CSR_RC,  i_exu_rs1 & ~i_exu_csr_src}       
+    );
+
     // alu
+    reg  [`CPU_Bus] exu_alu_res;
     wire [`CPU_Bus] num1, num2;
     wire [`CPU_Bus] num2_cplm = ~num2 + `CPU_Width'h1;   // 补码
     always @(*) begin
@@ -122,14 +148,16 @@ module exu(
         if(rst == 1'b1) 
             exu_valid_data_reg <= 0;
         else if(exu_reg_wen == 1'b1)
-            exu_valid_data_reg <= { exu_alu_res, exu_is_load, exu_is_store, exu_func3,
-                                    exu_rs1, exu_rs2, exu_imm, exu_pc, exu_is_jal,
-                                    exu_is_jalr, exu_brch, exu_rd_id, exu_gpr_wen };
+            exu_valid_data_reg <= { exu_exu_res, exu_is_load, exu_is_store, exu_func3,
+                                    exu_rs1, exu_rs2, exu_csr_npc, exu_is_mret, exu_is_ecall, 
+                                    exu_imm, exu_pc, exu_is_jal, exu_is_jalr, exu_brch, exu_rd_id, 
+                                    exu_gpr_wen, exu_csr_wid, exu_csr_rd, exu_csr_wen };
     end
 
-    assign{ o_exu_alu_res, o_exu_is_load, o_exu_is_store, o_exu_func3,
-            o_exu_rs1, o_exu_rs2, o_exu_imm, o_exu_pc, o_exu_is_jal,
-            o_exu_is_jalr, o_exu_brch, o_exu_rd_id, o_exu_gpr_wen } = exu_valid_data_reg;
+    assign{ o_exu_exu_res, o_exu_is_load, o_exu_is_store, o_exu_func3,
+            o_exu_rs1, o_exu_rs2, o_exu_csr_npc, o_exu_is_mret, o_exu_is_ecall, 
+            o_exu_imm, o_exu_pc, o_exu_is_jal, o_exu_is_jalr, o_exu_brch, o_exu_rd_id, 
+            o_exu_gpr_wen, o_exu_csr_wid, o_exu_csr_rd, o_exu_csr_wen } = exu_valid_data_reg;
 
 
 

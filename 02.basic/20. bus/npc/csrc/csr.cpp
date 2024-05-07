@@ -1,8 +1,9 @@
 #include "../include/common.h"
 
-#define top_mstatus   top->rv32__DOT__csr_regs_inst__DOT__mstatus
-#define top_mepc      top->rv32__DOT__csr_regs_inst__DOT__mepc
-#define top_mcause    top->rv32__DOT__csr_regs_inst__DOT__mcause
+#define top_mstatus   top->rv32__DOT__csr_ctrl_inst__DOT__mstatus
+#define top_mtvec     top->rv32__DOT__csr_ctrl_inst__DOT__mtvec
+#define top_mepc      top->rv32__DOT__csr_ctrl_inst__DOT__mepc
+#define top_mcause    top->rv32__DOT__csr_ctrl_inst__DOT__mcause
 
 
 // extern void etrace(int inst)

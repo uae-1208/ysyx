@@ -1,5 +1,5 @@
 `include "/home/uae/ysyx/ysyx-workbench/npc/vsrc/defines.v"
-`define LSU_PKG_WDITH (`CPU_Width+`CPU_Width+`CPU_Width+1+1+1+`CPU_Width+5+1)
+`define LSU_PKG_WDITH (`CPU_Width+`CPU_Width+`CPU_Width+1+1+1+`CPU_Width+1+`CPU_Width+5+1+1+1+1+12+`CPU_Width)
 
 module lsu(
     // system
@@ -25,8 +25,15 @@ module lsu(
     // from from Register File
     input  wire [`RegBus]  i_lsu_rs1,
     input  wire [`RegBus]  i_lsu_rs2,
+    // from from CSR Ctrl
+    input  wire [`CPU_Bus] i_lsu_csr_npc,
+    input  wire [`CSR_Bus] i_lsu_csr_wid,
+    input  wire [`RegBus]  i_lsu_csr_rd,
+    input  wire            i_lsu_csr_wen,  
+    input  wire            i_lsu_is_mret,
+    input  wire            i_lsu_is_ecall,
     // from EXU
-    input  wire [`CPU_Bus] i_lsu_alu_res,
+    input  wire [`CPU_Bus] i_lsu_exu_res,
     // to BRU
     output wire [`CPU_Bus] o_lsu_imm,
     output wire [`CPU_Bus] o_lsu_pc,
@@ -34,10 +41,17 @@ module lsu(
     output wire            o_lsu_is_jal,
     output wire            o_lsu_is_jalr,
     output wire            o_lsu_brch,    
+    output wire [`CPU_Bus] o_lsu_csr_npc,
+    output wire            o_lsu_is_ejump,  // exception jump    
     // to WEU
-    output wire [`CPU_Bus] o_lsu_rd,
+    output wire [`RegBus]  o_lsu_rd,
     output wire [4:0]      o_lsu_rd_id,
-    output wire            o_lsu_gpr_wen
+    output wire            o_lsu_gpr_wen,
+    output wire            o_lsu_csr_wen,
+    output wire            o_lsu_is_mret,
+    output wire            o_lsu_is_ecall,
+    output wire [`CSR_Bus] o_lsu_csr_wid,
+    output wire [`RegBus]  o_lsu_csr_rd
 );
 
     import "DPI-C" function int  dmem_read(input int raddr);
@@ -56,21 +70,27 @@ module lsu(
 
     /************ data package ************/
     // to BRU
-    wire [`CPU_Bus] lsu_imm     = i_lsu_imm;
-    wire [`CPU_Bus] lsu_pc      = i_lsu_pc; 
-    wire [`RegBus]  lsu_rs1     = i_lsu_rs1; 
-    wire            lsu_is_jal  = i_lsu_is_jal;
-    wire            lsu_is_jalr = i_lsu_is_jalr;
-    wire            lsu_brch    = i_lsu_brch;
+    wire [`CPU_Bus] lsu_imm      = i_lsu_imm;
+    wire [`CPU_Bus] lsu_pc       = i_lsu_pc; 
+    wire [`RegBus]  lsu_rs1      = i_lsu_rs1; 
+    wire            lsu_is_jal   = i_lsu_is_jal;
+    wire            lsu_is_jalr  = i_lsu_is_jalr;
+    wire            lsu_brch     = i_lsu_brch;
+    wire [`CPU_Bus] lsu_csr_npc  = i_lsu_csr_npc;
+    wire            lsu_is_ejump = i_lsu_is_mret | i_lsu_is_ecall; 
     // to WEU
     wire [`CPU_Bus] lsu_rd;
-    wire [4:0]      lsu_rd_id   = i_lsu_rd_id;
-    wire            lsu_gpr_wen = i_lsu_gpr_wen;  
-
+    wire [4:0]      lsu_rd_id    = i_lsu_rd_id;
+    wire            lsu_gpr_wen  = i_lsu_gpr_wen;  
+    wire            lsu_csr_wen  = i_lsu_csr_wen;
+    wire            lsu_is_mret  = i_lsu_is_mret;
+    wire            lsu_is_ecall = i_lsu_is_ecall;
+    wire [`CSR_Bus] lsu_csr_wid  = i_lsu_csr_wid;
+    wire [`CPU_Bus] lsu_csr_rd   = i_lsu_csr_rd;
 
 
     /************ read dmem ************/
-    wire [`CPU_Bus] dmem_raddr   = i_lsu_alu_res;
+    wire [`CPU_Bus] dmem_raddr   = i_lsu_exu_res;
     reg  [`CPU_Bus] dmem_rdata_t;
     reg  [`CPU_Bus] dmem_rdata;
     // 有读请求时
@@ -95,12 +115,12 @@ module lsu(
             endcase
         end
     end            
-    assign lsu_rd = (i_lsu_is_load == `TRUE) ? dmem_rdata : i_lsu_alu_res;  // Its load inst(1'b1) or not (1'b0)
+    assign lsu_rd = (i_lsu_is_load == `TRUE) ? dmem_rdata : i_lsu_exu_res;  // Its load inst(1'b1) or not (1'b0)
 
 
 
     /************ write dmem ************/
-    wire [`CPU_Bus] dmem_waddr = i_lsu_alu_res;
+    wire [`CPU_Bus] dmem_waddr = i_lsu_exu_res;
     wire [`CPU_Bus] dmem_wdata = i_lsu_rs2;
     reg  [7:0]    wmask;
     // wmask
@@ -130,12 +150,14 @@ module lsu(
         if(rst == 1'b1) 
             lsu_valid_data_reg <= 0;
         else if(lsu_reg_wen == 1'b1)
-            lsu_valid_data_reg <= { lsu_imm, lsu_pc, lsu_rs1, lsu_is_jal, lsu_is_jalr, 
-                                    lsu_brch, lsu_rd, lsu_rd_id, lsu_gpr_wen };
+            lsu_valid_data_reg <= { lsu_imm, lsu_pc, lsu_rs1, lsu_is_jal, lsu_is_jalr, lsu_brch, 
+                                    lsu_csr_npc, lsu_is_ejump, lsu_rd, lsu_rd_id, lsu_gpr_wen, 
+                                    lsu_csr_wen, lsu_is_mret, lsu_is_ecall, lsu_csr_wid, lsu_csr_rd };
     end
 
-    assign{ o_lsu_imm, o_lsu_pc, o_lsu_rs1, o_lsu_is_jal, o_lsu_is_jalr, 
-            o_lsu_brch, o_lsu_rd, o_lsu_rd_id, o_lsu_gpr_wen } = lsu_valid_data_reg;
+    assign{ o_lsu_imm, o_lsu_pc, o_lsu_rs1, o_lsu_is_jal, o_lsu_is_jalr, o_lsu_brch, 
+            o_lsu_csr_npc, o_lsu_is_ejump, o_lsu_rd, o_lsu_rd_id, o_lsu_gpr_wen, 
+            o_lsu_csr_wen, o_lsu_is_mret, o_lsu_is_ecall, o_lsu_csr_wid, o_lsu_csr_rd } = lsu_valid_data_reg;
 
 
 
